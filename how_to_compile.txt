@@ -1,0 +1,1 @@
+gcc -o main opengl_viewer.cpp -lglut -lGLU -lGL

@@ -1,0 +1,14 @@
+stl file structure 
+
+
+solid ---blablabla---
+facet normal float float float
+ outer loop
+  vertex float float float
+  vertex float float float
+  vertex float float float
+ endloop
+endfacet
+endsolid
+
+in example file 2198 faces
