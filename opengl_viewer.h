@@ -39,69 +39,59 @@ Camera camera;
 // Clears the window and draws the tetrahedron.  The tetrahedron is  easily
 // specified with a triangle strip, though the specification really isn't very
 // easy to read.
-void display() {
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glLoadIdentity();
-  gluLookAt(camera.getX(), camera.getY(), camera.getZ(),
-            0.0, 0.0, 0.0,
-            0.0, 1.0, 0.0);
-  // Draw a white grid "floor" for the tetrahedron to sit on.
-  glColor3f(1.0, 1.0, 1.0);
-  glBegin(GL_LINES);
-  for (GLfloat i = -2.5; i <= 2.5; i += 0.25) {
-    glVertex3f(i, 0, 2.5); glVertex3f(i, 0, -2.5);
-    glVertex3f(2.5, 0, i); glVertex3f(-2.5, 0, i);
-  }
-  glEnd();
+// void display() {
+//   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//   glLoadIdentity();
+//   gluLookAt(camera.getX(), camera.getY(), camera.getZ(),
+//             0.0, 0.0, 0.0,
+//             0.0, 1.0, 0.0);
+//   // Draw a white grid "floor" for the tetrahedron to sit on.
+//   glColor3f(1.0, 1.0, 1.0);
+//   glBegin(GL_LINES);
+//   for (GLfloat i = -2.5; i <= 2.5; i += 0.25) {
+//     glVertex3f(i, 0, 2.5); glVertex3f(i, 0, -2.5);
+//     glVertex3f(2.5, 0, i); glVertex3f(-2.5, 0, i);
+//   }
+//   glEnd();
 
-  // Draw the tetrahedron.  It is a four sided figure, so when defining it
-  // with a triangle strip we have to repeat the last two vertices.
-  glBegin(GL_TRIANGLES);
-    // (0, 2, 0) (-1, 0, 1) (1, 0, 1) (0, 0, -1.4)
-    glColor3f(1, 1, 1); //white
-    glVertex3f(0, 2, 0);
-    
-    glColor3f(1, 1, 1); 
-    glVertex3f(-1, 0, 1);
-    
-    glColor3f(1, 1, 1); 
-    glVertex3f(1, 0, 1);
+//   // Draw the tetrahedron.  It is a four sided figure, so when defining it
+//   // with a triangle strip we have to repeat the last two vertices.
+//   glBegin(GL_TRIANGLES);
+//     // (0, 2, 0) (-1, 0, 1) (1, 0, 1) (0, 0, -1.4)
+//     // glColor3f(1, 1, 1); //white
+//     // glVertex3f(0, 2, 0);
+//     // glVertex3f(-1, 0, 1);
+//     // glVertex3f(1, 0, 1);
     
 
-    glColor3f(1, 0, 0); //red
-    glVertex3f(-1, 0, 1);
-    
-    glColor3f(1, 0, 0); 
-    glVertex3f(1, 0, 1);
-
-    glColor3f(1, 0, 0); 
-    glVertex3f(0, 0, -1.4);
+//     // glColor3f(1, 0, 0); //red
+//     // glVertex3f(-1, 0, 1);
+//     // glVertex3f(1, 0, 1);
+//     // glVertex3f(0, 0, -1.4);
     
 
-    glColor3f(0, 1, 0); // green
-    glVertex3f(1, 0, 1);
-    
-    glColor3f(0, 1, 0); 
-    glVertex3f(0, 0, -1.4);
-
-    glColor3f(0, 1, 0); 
-    glVertex3f(0, 2, 0);
+//     // glColor3f(0, 1, 0); // green
+//     // glVertex3f(1, 0, 1);
+//     // glVertex3f(0, 0, -1.4);
+//     // glVertex3f(0, 2, 0);
 
 
-    glColor3f(1, 0, 1); // magenta
-    glVertex3f(0, 0, -1.4);
-    
-    glColor3f(1, 0, 1); 
-    glVertex3f(-1, 0, 1);
+//     glColor3f(1, 0, 1); // magenta
+//     glVertex3f(0, 0, -1.4);
+//     glVertex3f(-1, 0, 1);
+//     glVertex3f(0, 2, 0);
 
-    glColor3f(1, 0, 1); 
-    glVertex3f(0, 2, 0);
-  glEnd();
+//     glColor3f(1, 0, 1); // magenta
+//     glVertex3f(0.0, 0, 1);
+//     glVertex3f(-3, 0, 2);
+//     glVertex3f(-4, 0, 4);
 
-  glFlush();
-  glutSwapBuffers();
+//   glEnd();
 
-}
+//   glFlush();
+//   glutSwapBuffers();
+
+// }
 
 // Moves the camera according to the key pressed, then ask to refresh the
 // display.
@@ -133,8 +123,8 @@ void init() {
   // Since there is only one closed polyhedron in the whole scene,
   // eliminating the drawing of backfaces gives us the realism we need.
   // THIS DOES NOT WORK IN GENERAL.
-  glEnable(GL_CULL_FACE);
-  glCullFace(GL_BACK);
+  // glEnable(GL_CULL_FACE);
+  // glCullFace(GL_BACK);
 
   // Set the camera lens so that we have a perspective viewing volume whose
   // horizontal bounds at the near clipping plane are -2..2 and vertical
@@ -173,16 +163,16 @@ void timer(int v) {
 
 // Initializes GLUT, the display mode, and main window; registers callbacks;
 // does application initialization; enters the main event loop.
-int main(int argc, char** argv) {
-  glutInit(&argc, argv);
-  glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
-  glutInitWindowPosition(80, 80);
-  glutInitWindowSize(800, 600);
-  glutCreateWindow("A Simple Tetrahedron");
-  glutDisplayFunc(display);
-  glutReshapeFunc(reshape);
-  glutSpecialFunc(special);
-  glutTimerFunc(100, timer, 0);
-  init();
-  glutMainLoop();
-}
+// int main(int argc, char** argv) {
+//   glutInit(&argc, argv);
+//   glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
+//   glutInitWindowPosition(80, 80);
+//   glutInitWindowSize(800, 600);
+//   glutCreateWindow("A Simple Tetrahedron");
+//   glutDisplayFunc(display);
+//   glutReshapeFunc(reshape);
+//   glutSpecialFunc(special);
+//   glutTimerFunc(100, timer, 0);
+//   init();
+//   glutMainLoop();
+// }
