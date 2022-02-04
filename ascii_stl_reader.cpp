@@ -106,7 +106,8 @@ int main(int argc, char const *argv[])
 		// std::cout << "face " << i << " normal x coord = "<< faces[i].n.x << std::endl;
 		for(size_t y = 0; y < faces[i].vertices.size(); y++){
 			// std::cout << "vertex " << y << " x coord = " << faces[i].vertices[y].x << std::endl;
-			std::cout << faces[i].vertices[y].x << ";" << faces[i].vertices[y].y << ";" << faces[i].vertices[y].z << std::endl;
+			// std::cout << faces[i].vertices[y].x << ";" << faces[i].vertices[y].y << ";" << faces[i].vertices[y].z << std::endl;
+			std::cout << faces[i].n.x << " " << faces[i].n.y << " " << faces[i].n.z << std::endl;
 		}
 		std::cout << std::endl;
 	}

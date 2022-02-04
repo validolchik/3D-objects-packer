@@ -23,12 +23,12 @@ void display() {
 
   for(size_t i = 0; i < faces.size(); i++){
 		// std::cout << "face " << i << " normal x coord = "<< faces[i].n.x << std::endl;
-		if (faces[i].n.y > 0){
-			glColor3f(0, 0, 1);	
-		} else {
-			glColor3f(1, 0, 1);
-		}
-		// glColor3f(1, 0, 1);
+		// if (faces[i].n.y > 0){
+		// 	glColor3f(0, 0, 1);	
+		// } else {
+		// 	glColor3f(1, 0, 1);
+		// }
+		glColor3f(faces[i].n.x, faces[i].n.y, faces[i].n.z);
 
   	// std::cout << faces[i].n.z << std::endl;
 
