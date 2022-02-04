@@ -52,6 +52,7 @@ int process_facet_block(std::vector<std::string> facet_block){
 		// std::cout << parsed_string[1] << parsed_string[2] <<  parsed_string[3] << std::endl;
 		VERTEX v = {std::stof(parsed_string[1]), std::stof(parsed_string[2]), std::stof(parsed_string[3])};
 		face.vertices.push_back(v);
+		face.n = normal;
 	}
 
 	faces.push_back(face);

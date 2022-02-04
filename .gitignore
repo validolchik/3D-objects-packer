@@ -1,1 +1,7 @@
-token
+*
+
+!token
+!*.cpp
+!*.sh
+!*.txt
+!README.md

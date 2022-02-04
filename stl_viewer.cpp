@@ -21,16 +21,24 @@ void display() {
   // with a triangle strip we have to repeat the last two vertices.
   glBegin(GL_TRIANGLES);
 
-  	for(size_t i = 0; i < faces.size(); i++){
+  for(size_t i = 0; i < faces.size(); i++){
 		// std::cout << "face " << i << " normal x coord = "<< faces[i].n.x << std::endl;
-		glColor3f(0, 0, 1);
+		if (faces[i].n.y > 0){
+			glColor3f(0, 0, 1);	
+		} else {
+			glColor3f(1, 0, 1);
+		}
+		// glColor3f(1, 0, 1);
+
+  	// std::cout << faces[i].n.z << std::endl;
+
 		for(size_t j = 0; j < faces[i].vertices.size(); j++){
 			// std::cout << "vertex " << y << " x coord = " << faces[i].vertices[y].x << std::endl;
 			// std::cout << faces[i].vertices[y].x << ";" << faces[i].vertices[y].y << ";" << faces[i].vertices[y].z << std::endl;
 			GLfloat x = faces[i].vertices[j].x;
 			GLfloat y = faces[i].vertices[j].y;
 			GLfloat z = faces[i].vertices[j].z;
-			glVertex3f(x, y, z);
+			glVertex3f(x/10, y/10, z/10);
 		}
 		// std::cout << std::endl;
 	}
