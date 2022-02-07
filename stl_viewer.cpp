@@ -28,17 +28,20 @@ void display() {
 		// } else {
 		// 	glColor3f(1, 0, 1);
 		// }
-		glColor3f(faces[i].n.x, faces[i].n.y, faces[i].n.z);
+		if (faces[i].n.y <= 0){
+			glColor3f(faces[i].n.x, faces[i].n.y, faces[i].n.z);
 
-  	// std::cout << faces[i].n.z << std::endl;
+	  	// std::cout << faces[i].n.z << std::endl;
 
-		for(size_t j = 0; j < faces[i].vertices.size(); j++){
-			// std::cout << "vertex " << y << " x coord = " << faces[i].vertices[y].x << std::endl;
-			// std::cout << faces[i].vertices[y].x << ";" << faces[i].vertices[y].y << ";" << faces[i].vertices[y].z << std::endl;
-			GLfloat x = faces[i].vertices[j].x;
-			GLfloat y = faces[i].vertices[j].y;
-			GLfloat z = faces[i].vertices[j].z;
-			glVertex3f(x/10, y/10, z/10);
+			for(size_t j = 0; j < faces[i].vertices.size(); j++){
+				// std::cout << "vertex " << y << " x coord = " << faces[i].vertices[y].x << std::endl;
+				// std::cout << faces[i].vertices[y].x << ";" << faces[i].vertices[y].y << ";" << faces[i].vertices[y].z << std::endl;
+				GLfloat x = faces[i].vertices[j].x;
+				// GLfloat y = faces[i].vertices[j].y;
+				GLfloat y = 0;
+				GLfloat z = faces[i].vertices[j].z;
+				glVertex3f(x/10, y, z/10);
+			}
 		}
 		// std::cout << std::endl;
 	}

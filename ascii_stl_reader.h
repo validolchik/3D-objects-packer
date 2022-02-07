@@ -21,6 +21,16 @@ struct FACE{
 	struct NORMAL n;
 };
 
+struct OBJECT{
+	std::vector<FACE> object_faces;
+	// min x max x min y max y min z max z
+	std::vector<float> boundaries;
+	std::vector<std::vector<bool>> body;
+};
+
+std::vector<FACE> faces;
+std::vector<OBJECT> objects;
+
 std::vector<std::string> parse_string(std::string string, std::string delimiter){
 	std::vector<std::string> tokens;
 
@@ -35,7 +45,6 @@ std::vector<std::string> parse_string(std::string string, std::string delimiter)
 
 	return tokens;
 }
-std::vector<FACE> faces;
 
 int process_facet_block(std::vector<std::string> facet_block){
 	std::vector<std::string> parsed_string = parse_string(facet_block[0].substr(1, facet_block[0].size()), " ");
@@ -60,6 +69,22 @@ int process_facet_block(std::vector<std::string> facet_block){
 	return 0;
 }
 
+std::vector<float> find_boundaries(std::vector<FACE> faces){
+	std::vector<float> boundaries = {faces[0].vertices[0].x, faces[0].vertices[0].x, 
+		faces[0].vertices[0].y, faces[0].vertices[0].y, 
+		faces[0].vertices[0].z, faces[0].vertices[0].z};
+	for(size_t i = 0; i < faces.size(); i++){
+		for(size_t j = 0; j < faces[i].vertices.size(); j++){
+			boundaries[0] = std::min(boundaries[0], faces[i].vertices[j].x);
+			boundaries[1] = std::max(boundaries[1], faces[i].vertices[j].x);
+			boundaries[2] = std::min(boundaries[2], faces[i].vertices[j].y);
+			boundaries[3] = std::max(boundaries[3], faces[i].vertices[j].y);
+			boundaries[4] = std::min(boundaries[4], faces[i].vertices[j].z);
+			boundaries[5] = std::max(boundaries[5], faces[i].vertices[j].z);	
+		}
+	}
+	return boundaries;
+}
 
 int process_stl_file(std::string filename){
 	std::string line;
@@ -70,6 +95,7 @@ int process_stl_file(std::string filename){
 	// std::ifstream myfile (argv[1]);
 	std::ifstream myfile (filename);
 	if (myfile.is_open()){
+		OBJECT object;
 		while ( getline (myfile, line) ){
 			// if (line.find("facet") != std::string::npos) {
 			//     facet_block.push_back(line);
@@ -87,14 +113,19 @@ int process_stl_file(std::string filename){
 			else if(reading_facet){
 				facet_block.push_back(line);
 			}
-
 	    }
+	    object.object_faces = faces;
+	    object.boundaries = find_boundaries(faces);
+	    objects.push_back(object);
 	    myfile.close();
 	}
 	else std::cout << "Unable to open file"; 
 
-	std::cout << faces.size() << std::endl;
-
+	std::cout << "number of faces: " << faces.size() << std::endl;
+	for(size_t i = 0; i < objects[0].boundaries.size(); i++){
+		std::cout << objects[0].boundaries[i] << " ";
+	}
+	std::cout << std::endl;
 	return 0;
 }
 
