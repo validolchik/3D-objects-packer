@@ -46,7 +46,7 @@ collision detection
 several figures
 
 */
-float grid_cell_size = 0.5;
+float grid_cell_size = 0.1;
 
 float half_plane_sign (VERTEX p1, VERTEX p2, VERTEX p3)
 {
@@ -111,7 +111,7 @@ void fill_body_grid(OBJECT obj, std::vector<std::vector<bool>>& empty_grid){
 	int inside_count = 0;
 	int overall_count = empty_grid.size() * empty_grid[0].size();
 	for(size_t i = 0; i < obj.object_faces.size(); i++){
-		for (VERTEX v : obj.object_faces[i].vertices) std::cout << "vertex " << v.x << " " << v.z << 	std::endl; 
+		// for (VERTEX v : obj.object_faces[i].vertices) std::cout << "vertex " << v.x << " " << v.z << 	std::endl; 
 
 		VERTEX v0 = obj.object_faces[i].vertices[0];
 		VERTEX v1 = obj.object_faces[i].vertices[1];
@@ -122,15 +122,15 @@ void fill_body_grid(OBJECT obj, std::vector<std::vector<bool>>& empty_grid){
 		int x_max_grid = int_bounds_in_grid[1];
 		int y_min_grid = int_bounds_in_grid[2];
 		int y_max_grid = int_bounds_in_grid[3];
-		std::cout << "square bounds of face: ";
-		std::cout << x_min_grid << " " << x_max_grid << " " << y_min_grid << " " << y_max_grid << std::endl;
+		// std::cout << "square bounds of face: ";
+		// std::cout << x_min_grid << " " << x_max_grid << " " << y_min_grid << " " << y_max_grid << std::endl;
 
 		for (int j = x_min_grid; j < x_max_grid; ++j)
 		{
 			for (int k = y_min_grid; k < y_max_grid; ++k)
 			{
 				VERTEX p = {j*grid_cell_size, 0, k*grid_cell_size}; // in absolute
-				std::cout << "test point " << p.x << " " << p.y << " " << p.z << std::endl;
+				// std::cout << "test point " << p.x << " " << p.y << " " << p.z << std::endl;
 				// std::cout << k << ' ' << j << std::endl;
 				if (point_in_triangle(p, v0, v1, v2)){
 					if (!empty_grid[j][k]) inside_count++;
@@ -138,7 +138,7 @@ void fill_body_grid(OBJECT obj, std::vector<std::vector<bool>>& empty_grid){
 					// empty_grid[j+1][k] = true;
 					// empty_grid[j+1][k] = true;
 					// empty_grid[j+1][k+1] = true;//fix the indexes here
-					std::cout << p.x << ";" <<  p.z << " is inside" << std::endl;
+					// std::cout << p.x << ";" <<  p.z << " is inside" << std::endl;
 					// inside_count++;
 				}
 			}

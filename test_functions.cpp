@@ -1,7 +1,7 @@
 #include<iostream>
 #include "ascii_stl_reader.h"
 #include "transform_to_array.cpp"
-
+#include <fstream>
 
 struct fPoint{
 	float x;
@@ -50,13 +50,16 @@ int main(int argc, char const *argv[])
 	assign_body_grid(objects[0], empty_grid);
 	std::cout << "assigned grid to the body" << std::endl;
 
+	std::ofstream myfile;
+	myfile.open ("square_representation_of_model");
 	for(int i = 0; i < empty_grid.size(); i++){
 		for(int y = 0; y < empty_grid[i].size(); y++){
-			if(empty_grid[i][y]) std::cout << 0;
-			else std::cout << "_";
+			if(empty_grid[i][y]) myfile << 0;
+			else myfile << "_";
 		}
-		std::cout << std::endl;
+		myfile << std::endl;
 	}
+	myfile.close();
 
 	return 0;
 }
