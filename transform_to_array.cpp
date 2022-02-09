@@ -50,7 +50,7 @@ float grid_cell_size = 0.5;
 
 float half_plane_sign (VERTEX p1, VERTEX p2, VERTEX p3)
 {
-    return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
+    return (p1.x - p3.x) * (p2.z - p3.z) - (p2.x - p3.x) * (p1.z - p3.z);
 }
 
 bool point_in_triangle (VERTEX pt, VERTEX v1, VERTEX v2, VERTEX v3)
@@ -68,15 +68,9 @@ bool point_in_triangle (VERTEX pt, VERTEX v1, VERTEX v2, VERTEX v3)
     return !(has_neg && has_pos);
 }
 
-// shift 
-std::vector<float> shift_in_boundaries(OBJECT obj){
-	std::vector<float> shift = {0 - obj.boundaries[0], 0 - obj.boundaries[4]};
-	return shift;
-}
-
 std::vector<std::vector<bool>> produce_empty_body_grid(OBJECT obj){
-	int rows = (obj.boundaries[1] - obj.boundaries[0]) / grid_cell_size; 
-	int columns = (obj.boundaries[5] - obj.boundaries[4]) / grid_cell_size;
+	int rows = int((obj.boundaries[1] - obj.boundaries[0] + grid_cell_size) / grid_cell_size); 
+	int columns = int((obj.boundaries[5] - obj.boundaries[4] + grid_cell_size) / grid_cell_size);
 
 	std::cout << "grid size" << std::endl;
 	std::cout << rows << " " << columns << std::endl;
@@ -113,24 +107,22 @@ std::vector<int> find_int_square_triangle(std::vector<float> float_boundaries){
 
 void fill_body_grid(OBJECT obj, std::vector<std::vector<bool>>& empty_grid){
 	std::cout << "filling the grid" << std::endl;
-	std::vector<float> shift = shift_in_boundaries(obj);
-	
-	for(float s : shift) std::cout << "shift " << s << std::endl;
 
 	int inside_count = 0;
-	for(size_t i = 0; i < 3; i++){
-		for (VERTEX v : faces[i].vertices) std::cout << "vertex " << v.x << " " << v.z << 	std::endl; 
+	int overall_count = empty_grid.size() * empty_grid[0].size();
+	for(size_t i = 0; i < obj.object_faces.size(); i++){
+		for (VERTEX v : obj.object_faces[i].vertices) std::cout << "vertex " << v.x << " " << v.z << 	std::endl; 
 
-		VERTEX v0 = faces[i].vertices[0];
-		VERTEX v1 = faces[i].vertices[1];
-		VERTEX v2 = faces[i].vertices[2];
-		std::vector<int> int_bounds_in_grid = find_int_square_triangle(find_square_bounds_of_triangle(faces[i]));
+		VERTEX v0 = obj.object_faces[i].vertices[0];
+		VERTEX v1 = obj.object_faces[i].vertices[1];
+		VERTEX v2 = obj.object_faces[i].vertices[2];
+		std::vector<int> int_bounds_in_grid = find_int_square_triangle(find_square_bounds_of_triangle(obj.object_faces[i]));
 
 		int x_min_grid = int_bounds_in_grid[0];
 		int x_max_grid = int_bounds_in_grid[1];
 		int y_min_grid = int_bounds_in_grid[2];
 		int y_max_grid = int_bounds_in_grid[3];
-		std::cout << "grid bounds" << std::endl;
+		std::cout << "square bounds of face: ";
 		std::cout << x_min_grid << " " << x_max_grid << " " << y_min_grid << " " << y_max_grid << std::endl;
 
 		for (int j = x_min_grid; j < x_max_grid; ++j)
@@ -139,18 +131,20 @@ void fill_body_grid(OBJECT obj, std::vector<std::vector<bool>>& empty_grid){
 			{
 				VERTEX p = {j*grid_cell_size, 0, k*grid_cell_size}; // in absolute
 				std::cout << "test point " << p.x << " " << p.y << " " << p.z << std::endl;
+				// std::cout << k << ' ' << j << std::endl;
 				if (point_in_triangle(p, v0, v1, v2)){
-					empty_grid[p.x - x_min_grid][p.y - y_min_grid] = true;
+					if (!empty_grid[j][k]) inside_count++;
+					empty_grid[j][k] = true;
 					// empty_grid[j+1][k] = true;
 					// empty_grid[j+1][k] = true;
 					// empty_grid[j+1][k+1] = true;//fix the indexes here
 					std::cout << p.x << ";" <<  p.z << " is inside" << std::endl;
-					inside_count++;
+					// inside_count++;
 				}
 			}
 		}
 	}
-	std::cout << inside_count << " inside out of " <<obj.object_faces.size()/10<< std::endl;
+	std::cout << inside_count << " inside out of " << overall_count << std::endl;
 }
 
 void assign_body_grid(OBJECT obj, std::vector<std::vector<bool>> grid){

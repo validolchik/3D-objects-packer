@@ -37,26 +37,26 @@ int main(int argc, char const *argv[])
 	shift_object_to_zero(objects[0]);
 	objects[0].boundaries = find_boundaries(objects[0].object_faces);
 
-	std::cout << "boundaries: ";
+	std::cout << "boundaries after shift: ";
 	for (float b : objects[0].boundaries) std::cout << b << " ";
 	std::cout << std::endl; 
 
 	std::vector<std::vector<bool>> empty_grid = produce_empty_body_grid(objects[0]);
 	std::cout << "empty_grid produced" << std::endl;
 	
-	// fill_body_grid(objects[0], empty_grid);
-	// std::cout << "grid filled" << std::endl;
+	fill_body_grid(objects[0], empty_grid);
+	std::cout << "grid filled" << std::endl;
 	
-	// assign_body_grid(objects[0], empty_grid);
-	// std::cout << "assigned grid to the body" << std::endl;
+	assign_body_grid(objects[0], empty_grid);
+	std::cout << "assigned grid to the body" << std::endl;
 
-	// for(int i = 0; i < empty_grid.size(); i++){
-	// 	for(int y = 0; y < empty_grid[i].size(); y++){
-	// 		if(empty_grid[i][y]) std::cout << 0;
-	// 		else std::cout << "_";
-	// 	}
-	// 	std::cout << std::endl;
-	// }
+	for(int i = 0; i < empty_grid.size(); i++){
+		for(int y = 0; y < empty_grid[i].size(); y++){
+			if(empty_grid[i][y]) std::cout << 0;
+			else std::cout << "_";
+		}
+		std::cout << std::endl;
+	}
 
 	return 0;
 }
