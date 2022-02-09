@@ -2,6 +2,8 @@
 #include "opengl_viewer.h"
 
 
+unsigned dispay_obj_index = 0;
+
 void display() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glLoadIdentity();
@@ -21,6 +23,8 @@ void display() {
   // with a triangle strip we have to repeat the last two vertices.
   glBegin(GL_TRIANGLES);
 
+  std::vector<FACE> faces = objects[dispay_obj_index].object_faces;
+
   for(size_t i = 0; i < faces.size(); i++){
 		// std::cout << "face " << i << " normal x coord = "<< faces[i].n.x << std::endl;
 		// if (faces[i].n.y > 0){
@@ -37,10 +41,10 @@ void display() {
 				// std::cout << "vertex " << y << " x coord = " << faces[i].vertices[y].x << std::endl;
 				// std::cout << faces[i].vertices[y].x << ";" << faces[i].vertices[y].y << ";" << faces[i].vertices[y].z << std::endl;
 				GLfloat x = faces[i].vertices[j].x;
-				// GLfloat y = faces[i].vertices[j].y;
-				GLfloat y = 0;
+				GLfloat y = faces[i].vertices[j].y;
+				// GLfloat y = 0;
 				GLfloat z = faces[i].vertices[j].z;
-				glVertex3f(x/10, y, z/10);
+				glVertex3f(x/10, y/10, z/10);
 			}
 		}
 		// std::cout << std::endl;
@@ -58,24 +62,41 @@ void display() {
 
 }
 
-
-int main(int argc, char *argv[])
-{	
-
-	process_stl_file(argv[1]);
-
-
+int view_stl(int argc, char *argv[]){
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowPosition(80, 80);
 	glutInitWindowSize(800, 600);
-	glutCreateWindow("A Simple Tetrahedron");
+	glutCreateWindow(objects[dispay_obj_index].filename.c_str());
 	glutDisplayFunc(display);
 	glutReshapeFunc(reshape);
 	glutSpecialFunc(special);
 	glutTimerFunc(100, timer, 0);
 	init();
 	glutMainLoop();
+
+	return 0;
+}
+
+
+int main(int argc, char *argv[])
+{	
+
+	process_stl_file(argv[1]);
+	// shift_object_to_zero(objects[dispay_obj_index]);
+	view_stl(argc, argv);
+
+	// glutInit(&argc, argv);
+	// glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
+	// glutInitWindowPosition(80, 80);
+	// glutInitWindowSize(800, 600);
+	// glutCreateWindow("A Simple Tetrahedron");
+	// glutDisplayFunc(display);
+	// glutReshapeFunc(reshape);
+	// glutSpecialFunc(special);
+	// glutTimerFunc(100, timer, 0);
+	// init();
+	// glutMainLoop();
 
 	return 0;
 }

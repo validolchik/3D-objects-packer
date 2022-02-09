@@ -114,7 +114,9 @@ std::vector<int> find_int_square_triangle(std::vector<float> float_boundaries){
 void fill_body_grid(OBJECT obj, std::vector<std::vector<bool>>& empty_grid){
 	std::cout << "filling the grid" << std::endl;
 	std::vector<float> shift = shift_in_boundaries(obj);
+	
 	for(float s : shift) std::cout << "shift " << s << std::endl;
+
 	int inside_count = 0;
 	for(size_t i = 0; i < 3; i++){
 		for (VERTEX v : faces[i].vertices) std::cout << "vertex " << v.x << " " << v.z << 	std::endl; 
@@ -155,13 +157,4 @@ void assign_body_grid(OBJECT obj, std::vector<std::vector<bool>> grid){
 	obj.body = grid;
 }
 
-// int main(int argc, char const *argv[])
-// {
-// 	std::cout << "Hello" << std::endl;
-
-// 	process_stl_file(argv[1]);
-
-// 	assign_body_grid(objects[0]);
-
-// 	return 0;
-// }
+// main in the test functionss

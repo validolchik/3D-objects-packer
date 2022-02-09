@@ -26,6 +26,7 @@ struct OBJECT{
 	// min x max x min y max y min z max z
 	std::vector<float> boundaries;
 	std::vector<std::vector<bool>> body;
+	std::string filename = "default";
 };
 
 std::vector<FACE> faces;
@@ -116,12 +117,14 @@ int process_stl_file(std::string filename){
 	    }
 	    object.object_faces = faces;
 	    object.boundaries = find_boundaries(faces);
+	    object.filename = filename;
 	    objects.push_back(object);
 	    myfile.close();
 	}
 	else std::cout << "Unable to open file"; 
 
 	std::cout << "number of faces: " << faces.size() << std::endl;
+	std::cout << "boundaries ";
 	for(size_t i = 0; i < objects[0].boundaries.size(); i++){
 		std::cout << objects[0].boundaries[i] << " ";
 	}
@@ -129,6 +132,19 @@ int process_stl_file(std::string filename){
 	return 0;
 }
 
+
+void shift_object_to_zero(OBJECT &obj){
+	std::cout << "shifting the object" << std::endl;
+	std::cout << "before: " << obj.object_faces[0].vertices[0].x << std::endl;
+	for(int i = 0; i < obj.object_faces.size(); i++){
+		for (int y = 0; y < obj.object_faces[i].vertices.size(); y++){
+			obj.object_faces[i].vertices[y].x -= obj.boundaries[0];
+			obj.object_faces[i].vertices[y].y -= obj.boundaries[2];
+			obj.object_faces[i].vertices[y].z -= obj.boundaries[4];
+		}
+	}
+	std::cout << "after: " << obj.object_faces[0].vertices[0].x << std::endl;
+}
 
 // int main(int argc, char const *argv[])
 // {	
