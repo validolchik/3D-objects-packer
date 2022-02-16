@@ -1,3 +1,5 @@
+#include <utility>
+
 // #include "ascii_stl_reader.h"
 // #include "opengl_viewer.h"
 // #include <iostream>
@@ -46,7 +48,7 @@ collision detection
 several figures
 
 */
-float grid_cell_size = 0.1;
+float grid_cell_size = 1;
 
 float half_plane_sign (VERTEX p1, VERTEX p2, VERTEX p3)
 {
@@ -68,16 +70,16 @@ bool point_in_triangle (VERTEX pt, VERTEX v1, VERTEX v2, VERTEX v3)
     return !(has_neg && has_pos);
 }
 
-std::vector<std::vector<bool>> produce_empty_body_grid(OBJECT obj){
+std::vector<std::vector<int>> produce_empty_body_grid(OBJECT obj){
 	int rows = int((obj.boundaries[1] - obj.boundaries[0] + grid_cell_size) / grid_cell_size); 
 	int columns = int((obj.boundaries[5] - obj.boundaries[4] + grid_cell_size) / grid_cell_size);
 
 	std::cout << "grid size" << std::endl;
 	std::cout << rows << " " << columns << std::endl;
 	
-	std::vector<std::vector<bool>> grid_body(
+	std::vector<std::vector<int>> grid_body(
     rows,
-    std::vector<bool>(columns));
+    std::vector<int>(columns, -1));
 
 	std::cout << sizeof(grid_body[0]) * grid_body.size() << " bytes" << std::endl;
 
@@ -105,7 +107,7 @@ std::vector<int> find_int_square_triangle(std::vector<float> float_boundaries){
 }
 
 
-void fill_body_grid(OBJECT obj, std::vector<std::vector<bool>>& empty_grid){
+void fill_body_grid(OBJECT obj, std::vector<std::vector<int>>& empty_grid){
 	std::cout << "filling the grid" << std::endl;
 
 	int inside_count = 0;
@@ -134,7 +136,7 @@ void fill_body_grid(OBJECT obj, std::vector<std::vector<bool>>& empty_grid){
 				// std::cout << k << ' ' << j << std::endl;
 				if (point_in_triangle(p, v0, v1, v2)){
 					if (!empty_grid[j][k]) inside_count++;
-					empty_grid[j][k] = true;
+					empty_grid[j][k] = obj.index;
 					// empty_grid[j+1][k] = true;
 					// empty_grid[j+1][k] = true;
 					// empty_grid[j+1][k+1] = true;//fix the indexes here
@@ -147,8 +149,9 @@ void fill_body_grid(OBJECT obj, std::vector<std::vector<bool>>& empty_grid){
 	std::cout << inside_count << " inside out of " << overall_count << std::endl;
 }
 
-void assign_body_grid(OBJECT obj, std::vector<std::vector<bool>> grid){
+void assign_body_grid(OBJECT obj, std::vector<std::vector<int>>& grid){
 	obj.body = grid;
 }
 
-// main in the test functionss
+// main in the test functions
+//

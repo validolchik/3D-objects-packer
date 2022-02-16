@@ -50,11 +50,6 @@ void display() {
 		// std::cout << std::endl;
 	}
 
-    // glColor3f(0, 0, 1); // blue
-    // glVertex3f(0, 0, -1.4);
-    // glVertex3f(-1, 0, 1);
-    // glVertex3f(0, 2, 0);
-
   glEnd();
 
   glFlush();
@@ -83,20 +78,7 @@ int main(int argc, char *argv[])
 {	
 
 	process_stl_file(argv[1]);
-	// shift_object_to_zero(objects[dispay_obj_index]);
 	view_stl(argc, argv);
-
-	// glutInit(&argc, argv);
-	// glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
-	// glutInitWindowPosition(80, 80);
-	// glutInitWindowSize(800, 600);
-	// glutCreateWindow("A Simple Tetrahedron");
-	// glutDisplayFunc(display);
-	// glutReshapeFunc(reshape);
-	// glutSpecialFunc(special);
-	// glutTimerFunc(100, timer, 0);
-	// init();
-	// glutMainLoop();
 
 	return 0;
 }

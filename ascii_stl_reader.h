@@ -3,6 +3,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <sys/stat.h>
 
 struct VERTEX{
 	float x;
@@ -25,12 +26,28 @@ struct OBJECT{
 	std::vector<FACE> object_faces;
 	// min x max x min y max y min z max z
 	std::vector<float> boundaries;
-	std::vector<std::vector<bool>> body;
+	std::vector<std::vector<int>> body;
 	std::string filename = "default";
+    int index;
 };
 
+std::vector<std::string> models_filenames;
 std::vector<FACE> faces;
 std::vector<OBJECT> objects;
+
+bool is_path_exist(const std::string &s)
+{
+    struct stat buffer;
+    return (stat (s.c_str(), &buffer) == 0);
+}
+
+void read_filenames(std::string models){
+    std::ifstream input( models);
+
+    for( std::string line; getline( input, line ); ){
+        models_filenames.push_back(line);
+    }
+}
 
 std::vector<std::string> parse_string(std::string string, std::string delimiter){
 	std::vector<std::string> tokens;
@@ -93,10 +110,11 @@ int process_stl_file(std::string filename){
 	bool reading_facet = false;
 	std::vector<std::string> facet_block;
 
-	// std::ifstream myfile (argv[1]);
+    std::cout << std::endl << "opening the " << filename << std::endl;
+
 	std::ifstream myfile (filename);
 	if (myfile.is_open()){
-		OBJECT object;
+		OBJECT object = OBJECT();
 		while ( getline (myfile, line) ){
 			// if (line.find("facet") != std::string::npos) {
 			//     facet_block.push_back(line);
@@ -120,6 +138,7 @@ int process_stl_file(std::string filename){
 	    object.filename = filename;
 	    objects.push_back(object);
 	    myfile.close();
+        faces.clear();
 	}
 	else std::cout << "Unable to open file"; 
 
