@@ -4,33 +4,8 @@
 //#include <sys/stat.h>
 #include <fstream>
 
-struct fPoint{
-	float x;
-	float y;
-};
-
-
 int main(int argc, char const *argv[])
 {
-	// fPoint v1 = {0, 0};
-	// fPoint v2 = {1, 0};
-	// fPoint v3 = {0, 1};
-	// fPoint p = {0.5, 0.5};
-
-	// VERTEX vv1 = {10.3, 3.3, 3.4};
-	// VERTEX vv2 = {3.2, 2.1, 6.1};
-	// VERTEX vv3 = {9.6, 2.34, 5.4};
-
-	// FACE f;
-	// f.vertices = {vv1, vv2, vv3};
-
-	// // std::vector<float> boundaries = find_square_bounds_of_triangle(f);
-	// std::vector<int> int_bounds = find_int_square_triangle(find_square_bounds_of_triangle(f));
-
-	// for(float a : int_bounds) std::cout << a << " ";
-	// std::cout << std::endl;
-
-	// VERTEX p1 = {1, 1, 1};
     std::string file_with_models(argv[1]);
 
     read_filenames(file_with_models);
@@ -65,7 +40,8 @@ int main(int argc, char const *argv[])
         myfile.open (output_filename);
         for(int ii = 0; ii < grid.size(); ii++){
             for(int y = 0; y < grid[ii].size(); y++){
-                if(grid[ii][y] != -1) myfile << objects[i].index;
+//                if(grid[ii][y] != -1) myfile << objects[i].index;
+                if(grid[ii][y] != -1) myfile << grid[ii][y];
                 else myfile << "_";
             }
             myfile << std::endl;

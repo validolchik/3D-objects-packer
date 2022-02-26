@@ -131,12 +131,12 @@ void fill_body_grid(OBJECT obj, std::vector<std::vector<int>>& empty_grid){
 		{
 			for (int k = y_min_grid; k < y_max_grid; ++k)
 			{
-				VERTEX p = {j*grid_cell_size, 0, k*grid_cell_size}; // in absolute
+				VERTEX p = {j*grid_cell_size, 0, k*grid_cell_size};
 				// std::cout << "test point " << p.x << " " << p.y << " " << p.z << std::endl;
 				// std::cout << k << ' ' << j << std::endl;
 				if (point_in_triangle(p, v0, v1, v2)){
-					if (!empty_grid[j][k]) inside_count++;
-					empty_grid[j][k] = obj.index;
+					if (empty_grid[j][k] != -1) inside_count++;
+					empty_grid[j][k] = int(std::min(std::min(v0.y, v1.y), v2.y));
 					// empty_grid[j+1][k] = true;
 					// empty_grid[j+1][k] = true;
 					// empty_grid[j+1][k+1] = true;//fix the indexes here

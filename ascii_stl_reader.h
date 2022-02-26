@@ -4,32 +4,7 @@
 #include <string>
 #include <vector>
 #include <sys/stat.h>
-
-struct VERTEX{
-	float x;
-	float y;
-	float z;
-};
-
-struct NORMAL{
-	float x;
-	float y;
-	float z;
-};
-
-struct FACE{
-	std::vector<VERTEX> vertices;
-	struct NORMAL n;
-};
-
-struct OBJECT{
-	std::vector<FACE> object_faces;
-	// min x max x min y max y min z max z
-	std::vector<float> boundaries;
-	std::vector<std::vector<int>> body;
-	std::string filename = "default";
-    int index;
-};
+#include "classes.h"
 
 std::vector<std::string> models_filenames;
 std::vector<FACE> faces;
@@ -138,16 +113,16 @@ int process_stl_file(std::string filename){
 	    object.filename = filename;
 	    objects.push_back(object);
 	    myfile.close();
-        faces.clear();
 	}
 	else std::cout << "Unable to open file"; 
 
 	std::cout << "number of faces: " << faces.size() << std::endl;
-	std::cout << "boundaries ";
-	for(size_t i = 0; i < objects[0].boundaries.size(); i++){
-		std::cout << objects[0].boundaries[i] << " ";
-	}
-	std::cout << std::endl;
+//	std::cout << "boundaries ";
+//	for(size_t i = 0; i < objects[0].boundaries.size(); i++){
+//		std::cout << objects[0].boundaries[i] << " ";
+//	}
+//	std::cout << std::endl;
+    faces.clear();
 	return 0;
 }
 
