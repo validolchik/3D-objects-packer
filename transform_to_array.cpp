@@ -8,46 +8,6 @@
 // #include <fstream>
 
 
-/* i have array of faces where face is
-struct VERTEX{
-	float x;
-	float y;
-	float z;
-};
-
-struct NORMAL{
-	float x;
-	float y;
-	float z;
-};
-
-struct FACE{
-	std::vector<VERTEX> vertices;
-	struct NORMAL n;
-};
-
-struct OBJECT{
-	std::vector<FACE> object_faces;
-	// min x max x min y max y min z max z
-	std::vector<float> boundaries;
-};
-
-i need to create class or struct for representing the whole 3d object
-as 2d array
-
-desirable field:
--array itself
--area
--boundaries
-
-TODO:
-object as projection into grid
-write obejct to stl (or find one)
-move figure
-collision detection
-several figures
-
-*/
 float grid_cell_size = 1;
 
 float half_plane_sign (VERTEX p1, VERTEX p2, VERTEX p3)

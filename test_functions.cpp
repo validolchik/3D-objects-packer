@@ -40,8 +40,8 @@ int main(int argc, char const *argv[])
         myfile.open (output_filename);
         for(int ii = 0; ii < grid.size(); ii++){
             for(int y = 0; y < grid[ii].size(); y++){
-//                if(grid[ii][y] != -1) myfile << objects[i].index;
-                if(grid[ii][y] != -1) myfile << grid[ii][y];
+                if(grid[ii][y] != -1) myfile << objects[i].index;
+//                if(grid[ii][y] != -1) myfile << grid[ii][y];
                 else myfile << "_";
             }
             myfile << std::endl;

@@ -3,4 +3,5 @@ token
 !*.cpp
 !*.sh
 !*.txt
+!*.h
 !README.md

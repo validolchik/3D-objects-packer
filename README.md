@@ -1,6 +1,6 @@
 # About
 
-This project devoted to the thesis topic of Renat Valeev and implements ASCII .stl file reader / viewer
+This project devoted to the thesis project of Renat Valeev, BS-18-SB-01, 
 
 # Compilation
 
