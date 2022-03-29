@@ -1,3 +1,2 @@
 models/mario.stl
-models/foot_ascii.stl
 models/donkey_ascii.stl

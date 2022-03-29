@@ -67,7 +67,7 @@ std::vector<int> find_int_square_triangle(std::vector<float> float_boundaries){
 }
 
 
-void fill_body_grid(OBJECT obj, std::vector<std::vector<int>>& empty_grid){
+std::vector<std::vector<int>> fill_body_grid(OBJECT obj, std::vector<std::vector<int>> empty_grid){
 	std::cout << "filling the grid" << std::endl;
 
 	int inside_count = 0;
@@ -106,12 +106,10 @@ void fill_body_grid(OBJECT obj, std::vector<std::vector<int>>& empty_grid){
 			}
 		}
 	}
-	std::cout << inside_count << " inside out of " << overall_count << std::endl;
+//	std::cout << inside_count << " inside out of " << overall_count << std::endl;
+    return empty_grid;
 }
 
-void assign_body_grid(OBJECT obj, std::vector<std::vector<int>>& grid){
-	obj.body = grid;
+void assign_body_grid(OBJECT &obj, std::vector<std::vector<int>> grid){
+	 obj.body = grid;
 }
-
-// main in the test functions
-//

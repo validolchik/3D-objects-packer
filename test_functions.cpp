@@ -1,7 +1,7 @@
 #include<iostream>
 #include "ascii_stl_reader.h"
 #include "transform_to_array.cpp"
-//#include <sys/stat.h>
+#include <sys/stat.h>
 #include <fstream>
 
 int main(int argc, char const *argv[])
@@ -25,12 +25,14 @@ int main(int argc, char const *argv[])
 
         std::vector<std::vector<int>> grid = produce_empty_body_grid(objects[i]);
         std::cout << "empty_grid produced" << std::endl;
+        std::cout << "empty ?"<< grid.empty() << std::endl;
 
-        fill_body_grid(objects[i], grid);
+        grid = fill_body_grid(objects[i], grid);
         std::cout << "grid filled" << std::endl;
 
         assign_body_grid(objects[i], grid);
         std::cout << "assigned grid to the body" << std::endl;
+        std::cout << objects[i].body.empty() << " empty?" << std::endl;
 
         std::ofstream myfile;
         std::string representations_dir = "object_matrices";
@@ -38,9 +40,9 @@ int main(int argc, char const *argv[])
         std::string output_filename = representations_dir + "/" + std::to_string(i) + "representation";
         std::cout << "writing representation to the file " << output_filename << std::endl;
         myfile.open (output_filename);
-        for(int ii = 0; ii < grid.size(); ii++){
-            for(int y = 0; y < grid[ii].size(); y++){
-                if(grid[ii][y] != -1) myfile << objects[i].index;
+        for(int ii = 0; ii < objects[i].body.size(); ii++){
+            for(int y = 0; y < objects[i].body[ii].size(); y++){
+                if(objects[i].body[ii][y] != -1) myfile << objects[i].index;
 //                if(grid[ii][y] != -1) myfile << grid[ii][y];
                 else myfile << "_";
             }
@@ -48,7 +50,5 @@ int main(int argc, char const *argv[])
         }
         myfile.close();
     }
-
-
 	return 0;
 }
