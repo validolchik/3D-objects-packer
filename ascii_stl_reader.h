@@ -2,19 +2,11 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <vector>
-#include <sys/stat.h>
 #include "classes.h"
 
 std::vector<std::string> models_filenames;
 std::vector<FACE> faces;
 std::vector<OBJECT> objects;
-
-bool is_path_exist(const std::string &s)
-{
-    struct stat buffer;
-    return (stat (s.c_str(), &buffer) == 0);
-}
 
 void read_filenames(std::string models){
     std::ifstream input( models);
