@@ -1,2 +1,2 @@
 models/mario.stl
-models/donkey_ascii.stl
+models/mario.stl

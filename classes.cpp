@@ -46,7 +46,12 @@ struct POINT{
 
 inline bool operator<(const POINT& lhs, const POINT& rhs)
 {
-    return lhs.x < rhs.x;
+    return lhs.x < rhs.x or lhs.y < rhs.y;
+}
+
+inline bool operator==(const POINT& lhs, const POINT& rhs)
+{
+    return lhs.x == rhs.x and lhs.y == rhs.y;
 }
 
 struct VERTEX{
@@ -66,20 +71,109 @@ struct FACE{
     struct NORMAL n;
 };
 
-struct OBJECT{
+class Object{
+public:
     std::vector<FACE> object_faces;
     // min x max x min y max y min z max z
     std::vector<float> boundaries;
     std::vector<std::vector<int>> body;
     std::string filename = "default";
     int index;
+    std::vector<POINT> boundary_points; //actual boundaries of object
+    std::vector<POINT> points;
+    std::set<POINT> edges; //four points in the edges
+
+    bool boundary_point(int x, int y, std::vector<std::vector<int>> matrix){
+        if (x == 0 or y == 0) return true;
+        if (x == matrix.size()-1 or y == matrix[0].size() - 1) return true;
+
+        int lower = x - 1;
+        int upper = x + 1;
+        int left = y - 1;
+        int right = y + 1;
+        if (matrix[lower][y] == -1
+            or matrix[upper][y] == -1
+            or matrix[x][left] == -1
+            or matrix[x][right] == -1){
+            return true;
+        }
+
+        return false;
+    }
+
+    void find_edges(){
+        std::set<POINT> possible_candidate;
+        bool finding_edge = true;
+        int column = 0;
+        while(finding_edge) {
+            for (int i = 0; i < this->body.size(); i++) {
+                if (this->body[i][column] != -1) {
+                    possible_candidate.insert(POINT{i, column});
+                    finding_edge = false;
+                    break;
+                }
+            }
+            column++;
+        }
+
+        column = this->body[0].size()-1;
+        finding_edge = true;
+        while(finding_edge) {
+            for (int i = 0; i < this->body.size(); i++) {
+                if (this->body[i][column] != -1) {
+                    possible_candidate.insert(POINT{i, column});
+                    finding_edge = false;
+                    break;
+                }
+            }
+            column--;
+        }
+
+
+        int row = 0;
+        finding_edge = true;
+        while(finding_edge) {
+            for (int i = 0; i < this->body[0].size(); i++) {
+                if (this->body[row][i] != -1) {
+                    possible_candidate.insert(POINT{row, i});
+                    finding_edge = false;
+                    break;
+                }
+            }
+            row++;
+        }
+
+        row = this->body.size() - 1;
+        finding_edge = true;
+        while(finding_edge) {
+            for (int i = 0; i < this->body[0].size(); i++) {
+                if (this->body[row][i] != -1) {
+                    possible_candidate.insert(POINT{row, i});
+                    finding_edge = false;
+                    break;
+                }
+            }
+            row--;
+        }
+
+        std::cout << "possible points" << std::endl;
+
+        for(auto p : possible_candidate){
+            std::cout << p.x << " " << p.y << std::endl;
+        }
+
+        this->edges = possible_candidate;
+    }
+    
 };
 
 class Object_on_plate{
 public:
     int object_id;
     POINT ref_point; // upper left point of bounding box
-    std::set<POINT> boundary_points; //actual boundaries of object
+    std::vector<POINT> boundary_points; //actual boundaries of object
+    std::vector<POINT> points;
+    std::set<POINT> edges;
 
     int set_ref_point(int x, int y){
         POINT p = POINT();
@@ -95,14 +189,14 @@ public:
     }
 
     void insert_new_boundary_point(POINT p){
-        this->boundary_points.insert(p);
+        this->boundary_points.push_back(p);
     }
 
     void insert_new_boundary_point(int x, int y){
         POINT p = POINT();
         p.x = x;
         p.y = y;
-        this->boundary_points.insert(p);
+        this->boundary_points.push_back(p);
     }
 };
 
@@ -186,7 +280,7 @@ public:
         return false;
     }
 
-    int place_new_object(OBJECT obj){
+    int place_new_object(Object obj){
         if (obj.body.empty()){
             std::cout << "ERROR!! empty body in object received" << std::endl;
             return PLACEMENT_ERROR;
@@ -202,6 +296,7 @@ public:
         new_object.object_id = obj.index;
 
         if (objects_on_plate == 0){
+            this->objects_on_plate++;
             if (obj.boundaries[0] > this->size_x or obj.boundaries[5] > this->size_y){
                 std::cout << "object " << obj.index << " will not fit into plate" << std::endl;
                 return OBJECT_NOT_FIT;
@@ -215,27 +310,112 @@ public:
             std::cout << x_place << " " << y_place << std::endl;
 
             new_object.set_ref_point(x_place, y_place);
+            std::vector<POINT> points;
+            int count = 0;
 
-            for(size_t i = 0; i < obj.body.size(); i++){
-                for(size_t y = 0; y < obj.body[i].size(); y++){
-                    if (obj.body[i][y] != -1){
-                        this->plate[i + x_place][y + y_place] = obj.index;
-                    }
-                }
+            for(auto p : obj.points){
+                points.push_back(POINT{p.x + x_place, p.y + y_place});
+                count++;
+                this->plate[p.x + x_place][p.y + y_place] = obj.index;
             }
-            objects.push_back(new_object);
-        } else {
-            /*TODO
-             *
-            idea: take new object and check inside each placed obj
 
-             */
-            ;
+            new_object.points = points;
+            std::cout << "size of new_object points set = " << new_object.points.size() << std::endl;
+
+
+            for(auto p : obj.boundary_points){
+                new_object.insert_new_boundary_point(p.x+x_place, p.y+y_place);
+            }
+
+            for(auto p : obj.edges){
+                new_object.edges.insert(POINT{p.x + x_place, p.y + y_place});
+            }
+
+            this->objects.push_back(new_object);
+        } else {
+            std::vector<std::vector<int>> free_spaces = this->plate;
+            // take 4 ref points and follow them through boundaries of each object
+            // find 4 (or less) point on the boundaries
+            // find boundaries of object
+
+            std::cout << "4 edges" << std::endl;
+            for(auto p : obj.edges){
+                std::cout << p.x << " " << p.y << std::endl;
+            }
+
+
+
+
         }
 
         return GENERAL_SUCCESS;
     }
+    
+    std::set<POINT> find_edges(Object obj){
+        std::set<POINT> possible_candidate;
+        bool finding_edge = true;
+        int column = 0;
+        while(finding_edge) {
+            for (int i = 0; i < obj.body.size(); i++) {
+                if (obj.body[i][column] != -1) {
+                    possible_candidate.insert(POINT{i, column});
+                    finding_edge = false;
+                    break;
+                }
+            }
+            column++;
+        }
 
+        column = obj.body[0].size()-1;
+        finding_edge = true;
+        while(finding_edge) {
+            for (int i = 0; i < obj.body.size(); i++) {
+                if (obj.body[i][column] != -1) {
+                    possible_candidate.insert(POINT{i, column});
+                    finding_edge = false;
+                    break;
+                }
+            }
+            column--;
+        }
+
+
+        int row = 0;
+        finding_edge = true;
+        while(finding_edge) {
+            for (int i = 0; i < obj.body[0].size(); i++) {
+                if (obj.body[row][i] != -1) {
+                    possible_candidate.insert(POINT{row, i});
+                    finding_edge = false;
+                    break;
+                }
+            }
+            row++;
+        }
+
+        row = obj.body.size() - 1;
+        finding_edge = true;
+        while(finding_edge) {
+            for (int i = 0; i < obj.body[0].size(); i++) {
+                if (obj.body[row][i] != -1) {
+                    possible_candidate.insert(POINT{row, i});
+                    finding_edge = false;
+                    break;
+                }
+            }
+            row--;
+        }
+
+        std::cout << "possible points" << std::endl;
+
+        for(auto p : possible_candidate){
+            std::cout << p.x << " " << p.y << std::endl;
+        }
+
+        return possible_candidate;
+    }
+    
+    
     void print_boundaries_for_obj(unsigned int index, int width = 2){
         std::vector<std::vector<int>> print_plate(
                 this->size_x,
@@ -250,13 +430,17 @@ public:
     int save_matrix_to_file(std::string filename, std::vector<std::vector<int>> matrix, int width = 2){
         std::ofstream myfile;
         std::string representations_dir = "plate_matrices";
-        if(!is_path_exist(representations_dir)) mkdir(&representations_dir[0], S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+        if(!is_path_exist(representations_dir)){
+            mkdir(&representations_dir[0], S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+        }
         std::string output_filename = representations_dir + "/" + filename;
         std::cout << "saving boundaries to the file " << output_filename << std::endl;
         myfile.open (output_filename);
+        int count = 0;
         for(auto row : matrix){
             for(auto value : row){
                 if(value != -1){
+                    count++;
                     myfile<< std::setw(width) << value << " ";
                 }else{
                     myfile << std::setw(width) << "_" << " ";
@@ -265,6 +449,7 @@ public:
             myfile << std::endl;
         }
         myfile.close();
+        std::cout << count << " values != -1" << std::endl;
         return 0;
     }
 };

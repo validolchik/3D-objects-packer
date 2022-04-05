@@ -4,7 +4,7 @@
 
 //#include "classes.h"
 //#include <iostream>
-#include "ascii_stl_reader.h"
+#include "ascii_stl_reader.cpp"
 #include "transform_to_array.cpp"
 
 int main(int argc, char const *argv[]){
@@ -40,31 +40,36 @@ int main(int argc, char const *argv[]){
         std::cout << "assigned grid to the body" << std::endl;
         std::cout << objects[i].body.empty() << " empty?" << std::endl;
 
-//        std::ofstream myfile;
-//        std::string representations_dir = "object_matrices";
-//        if(!is_path_exist(representations_dir)) mkdir(&representations_dir[0], S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-//        std::string output_filename = representations_dir + "/" + std::to_string(i) + "representation";
-//        std::cout << "writing representation to the file " << output_filename << std::endl;
-//        myfile.open (output_filename);
-//        for(int ii = 0; ii < objects[i].body.size(); ii++){
-//            for(int y = 0; y < objects[i].body[ii].size(); y++){
-//                if(objects[i].body[ii][y] != -1) myfile << objects[i].index;
-////                if(grid[ii][y] != -1) myfile << grid[ii][y];
-//                else myfile << "_";
-//            }
-//            myfile << std::endl;
-//        }
-//        myfile.close();
+        std::vector<POINT> points;
+        std::vector<POINT> boundary_points;
+        for(size_t x = 0; x < objects[i].body.size(); x++){
+            for(size_t y = 0; y < objects[i].body[x].size(); y++){
+                if (objects[i].body[x][y] != -1){
+                    points.push_back(POINT{int(x), int(y)});
+                    if(objects[i].boundary_point(int(x), int(y), objects[i].body)){
+                        boundary_points.push_back(POINT{int(x), int(y)});
+                    }
+                }
+            }
+        }
+        objects[i].points = points;
+        objects[i].boundary_points = boundary_points;
+        std::cout << objects[i].points.size() << std::endl;
+        std::cout << objects[i].boundary_points.size() << std::endl;
+
+        objects[i].find_edges();
     }
     std::cout << "creating plate" << std::endl;
-    Plate plate(objects[0].boundaries[1] + 100, objects[0].boundaries[5] + 100);
+    Plate plate(objects[0].boundaries[1] + 30, objects[0].boundaries[5] + 30);
     plate.print_plate_info();
 
     std::cout << "empty grid ? " << objects[0].body.empty() << std::endl;
 
     plate.place_new_object(objects[0]);
-//    plate.print_plate(1);
+
     plate.save_plate_matrix_to_file("1");
-//    plate.print_boundaries_for_obj(0);
+    plate.print_boundaries_for_obj(0);
+
+    plate.place_new_object(objects[1]);
     return GENERAL_SUCCESS;
 }

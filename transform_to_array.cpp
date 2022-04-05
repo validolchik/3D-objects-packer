@@ -30,7 +30,7 @@ bool point_in_triangle (VERTEX pt, VERTEX v1, VERTEX v2, VERTEX v3)
     return !(has_neg && has_pos);
 }
 
-std::vector<std::vector<int>> produce_empty_body_grid(OBJECT obj){
+std::vector<std::vector<int>> produce_empty_body_grid(Object obj){
 	int rows = int((obj.boundaries[1] - obj.boundaries[0] + grid_cell_size) / grid_cell_size); 
 	int columns = int((obj.boundaries[5] - obj.boundaries[4] + grid_cell_size) / grid_cell_size);
 
@@ -67,10 +67,12 @@ std::vector<int> find_int_square_triangle(std::vector<float> float_boundaries){
 }
 
 
-std::vector<std::vector<int>> fill_body_grid(OBJECT obj, std::vector<std::vector<int>> empty_grid){
+std::vector<std::vector<int>> fill_body_grid(Object obj, std::vector<std::vector<int>> empty_grid){
 	std::cout << "filling the grid" << std::endl;
 
 	int inside_count = 0;
+    std::cout << "empty grid size" << std::endl;
+    std::cout << empty_grid.size() << " " << empty_grid[0].size() << std::endl;
 	int overall_count = empty_grid.size() * empty_grid[0].size();
 	for(size_t i = 0; i < obj.object_faces.size(); i++){
 		// for (VERTEX v : obj.object_faces[i].vertices) std::cout << "vertex " << v.x << " " << v.z << 	std::endl; 
@@ -86,14 +88,14 @@ std::vector<std::vector<int>> fill_body_grid(OBJECT obj, std::vector<std::vector
 		int y_max_grid = int_bounds_in_grid[3];
 		// std::cout << "square bounds of face: ";
 		// std::cout << x_min_grid << " " << x_max_grid << " " << y_min_grid << " " << y_max_grid << std::endl;
-
+//        std::cout << i << std::endl;
 		for (int j = x_min_grid; j < x_max_grid; ++j)
 		{
 			for (int k = y_min_grid; k < y_max_grid; ++k)
 			{
 				VERTEX p = {j*grid_cell_size, 0, k*grid_cell_size};
-				// std::cout << "test point " << p.x << " " << p.y << " " << p.z << std::endl;
-				// std::cout << k << ' ' << j << std::endl;
+//				 std::cout << "test point " << p.x << " " << p.y << " " << p.z << std::endl;
+//				 std::cout << k << ' ' << j << std::endl;
 				if (point_in_triangle(p, v0, v1, v2)){
 					if (empty_grid[j][k] != -1) inside_count++;
 					empty_grid[j][k] = int(std::min(std::min(v0.y, v1.y), v2.y));
@@ -110,6 +112,6 @@ std::vector<std::vector<int>> fill_body_grid(OBJECT obj, std::vector<std::vector
     return empty_grid;
 }
 
-void assign_body_grid(OBJECT &obj, std::vector<std::vector<int>> grid){
+void assign_body_grid(Object &obj, std::vector<std::vector<int>> grid){
 	 obj.body = grid;
 }

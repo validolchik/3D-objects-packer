@@ -1,5 +1,5 @@
 #include<iostream>
-#include "ascii_stl_reader.h"
+#include "ascii_stl_reader.cpp"
 #include "transform_to_array.cpp"
 #include <sys/stat.h>
 #include <fstream>

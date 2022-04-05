@@ -1,4 +1,4 @@
-#include "ascii_stl_reader.h"
+#include "ascii_stl_reader.cpp"
 #include "opengl_viewer.h"
 
 
