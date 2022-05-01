@@ -11,6 +11,7 @@
 #define GENERAL_SUCCESS 0
 #define RAND_GEN_ERROR -1
 #define OBJECT_NOT_FIT -2
+#define OCCUPIED_PLACE 1
 
 #include <iostream>
 #include <iomanip>
@@ -110,7 +111,7 @@ public:
                 if (this->body[i][column] != -1) {
                     possible_candidate.insert(POINT{i, column});
                     finding_edge = false;
-                    break;
+//                    break;
                 }
             }
             column++;
@@ -123,7 +124,7 @@ public:
                 if (this->body[i][column] != -1) {
                     possible_candidate.insert(POINT{i, column});
                     finding_edge = false;
-                    break;
+//                    break;
                 }
             }
             column--;
@@ -137,7 +138,7 @@ public:
                 if (this->body[row][i] != -1) {
                     possible_candidate.insert(POINT{row, i});
                     finding_edge = false;
-                    break;
+//                    break;
                 }
             }
             row++;
@@ -150,13 +151,23 @@ public:
                 if (this->body[row][i] != -1) {
                     possible_candidate.insert(POINT{row, i});
                     finding_edge = false;
-                    break;
+//                    break;
                 }
             }
             row--;
         }
 
         std::cout << "possible points" << std::endl;
+
+        POINT p1 = {0, 0};
+        POINT p2 = {body.size()-1, body[0].size()-1};
+        POINT p3 = {body.size()-1, 0};
+        POINT p4 = {0, body[0].size()-1};
+
+        possible_candidate.insert(p1);
+        possible_candidate.insert(p2);
+        possible_candidate.insert(p3);
+        possible_candidate.insert(p4);
 
         for(auto p : possible_candidate){
             std::cout << p.x << " " << p.y << std::endl;
@@ -171,7 +182,7 @@ class Object_on_plate{
 public:
     int object_id;
     POINT ref_point; // upper left point of bounding box
-    std::vector<POINT> boundary_points; //actual boundaries of object
+    std::vector<POINT> boundary_points; //actual boundaries of object on plate
     std::vector<POINT> points;
     std::set<POINT> edges;
 
@@ -333,17 +344,69 @@ public:
 
             this->objects.push_back(new_object);
         } else {
-            std::vector<std::vector<int>> free_spaces = this->plate;
+            std::vector<std::vector<int>> unavailable_placement = this->plate;
             // take 4 ref points and follow them through boundaries of each object
             // find 4 (or less) point on the boundaries
             // find boundaries of object
 
-            std::cout << "4 edges" << std::endl;
+            if (obj.body.empty() or obj.body[0].empty()){
+                std::cout << "Empty object received at placement" << std::endl;
+                return PLACEMENT_ERROR;
+            }
+            int obj_frame_size_x = obj.body.size();
+            int obj_frame_size_y = obj.body[0].size();
+
+            for(int i = size_x - obj_frame_size_x; i < size_x; i++){
+                for (int j = size_y - obj_frame_size_y; j < size_y; j++) {
+                    unavailable_placement[i][j] = OCCUPIED_PLACE;
+                }
+            }
+
+//            save_matrix_to_file("occupied_places", unavailable_placement);
+
+            std::cout << "edges" << std::endl;
             for(auto p : obj.edges){
                 std::cout << p.x << " " << p.y << std::endl;
             }
-
-
+            int c = 0;
+            for(auto &object_on_plate : this->objects){
+                for(auto edge_point : obj.boundary_points){
+                    for (auto &boundary_point : object_on_plate.points) {
+                        // object - one of the objects on plate
+                        // edge point - one of the edge points of new object
+                        // boundary_point - one of the boundary points of <object>
+                        POINT new_obj_ref_point = {boundary_point.x - edge_point.x, boundary_point.y - edge_point.y};
+//                        std::cout << "ref point absolute " << new_obj_ref_point.x << " " << new_obj_ref_point.y << std::endl;
+//                        std::cout << size_x << " " << size_y << std::endl;
+//                        std::cout << obj.points.size() << std::endl;
+                        for(auto &bp_new_obj : obj.boundary_points){
+                            POINT bp_new_obj_absolute = {
+                                    new_obj_ref_point.x + bp_new_obj.x,
+                                    new_obj_ref_point.y + bp_new_obj.y
+                            };
+//                            std::cout << bp_new_obj_absolute.x << " " << bp_new_obj_absolute.y << std::endl;
+                            int x = bp_new_obj_absolute.x;
+                            int y = bp_new_obj_absolute.y;
+                            if (x < 0 or y < 0 or new_obj_ref_point.x < 0 or new_obj_ref_point.y < 0) continue;
+                            if (unavailable_placement[x][y] != -1 and unavailable_placement[x][y] != 0){
+//                                for(auto &pp : obj.points){
+//                                    int xx = new_obj_ref_point.x+pp.x;
+//                                    int yy = new_obj_ref_point.y+pp.y;
+//                                    if (xx >= 0 and xx < size_x and yy >= 0 and yy < size_y) {
+//                                        unavailable_placement[xx][yy] = OCCUPIED_PLACE;
+//                                    }
+//                                }
+                                unavailable_placement[new_obj_ref_point.x][new_obj_ref_point.y] = OCCUPIED_PLACE;
+                                break;
+                            }
+                        }
+                    }
+                    std::string step = std::to_string(c);
+                    c++;
+//                    save_matrix_to_file("occupied_places_" + step, unavailable_placement);
+                }
+            }
+            save_matrix_to_file("occupied_places", unavailable_placement);
 
 
         }

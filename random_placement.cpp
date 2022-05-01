@@ -60,14 +60,14 @@ int main(int argc, char const *argv[]){
         objects[i].find_edges();
     }
     std::cout << "creating plate" << std::endl;
-    Plate plate(objects[0].boundaries[1] + 30, objects[0].boundaries[5] + 30);
+    Plate plate(objects[0].boundaries[1] + 90, objects[0].boundaries[5] + 90);
     plate.print_plate_info();
 
     std::cout << "empty grid ? " << objects[0].body.empty() << std::endl;
 
     plate.place_new_object(objects[0]);
 
-    plate.save_plate_matrix_to_file("1");
+    plate.save_plate_matrix_to_file("matrix");
     plate.print_boundaries_for_obj(0);
 
     plate.place_new_object(objects[1]);
