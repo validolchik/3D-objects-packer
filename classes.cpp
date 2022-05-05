@@ -19,9 +19,10 @@
 #include <random>
 #include <cstdlib>
 #include <ctime>
-#include <vector>
 #include <sys/stat.h>
 #include <set>
+#include <map>
+
 
 int init_random_seq(){
     srand((unsigned) time(0));
@@ -218,6 +219,7 @@ public:
     std::vector<POINT> occupied;
     std::vector<std::vector<int>> plate;
     int plate_default_placement_value;
+    std::map<int, int> obj_index_to_list_index;
 
     explicit Plate(unsigned int size_x = 100, unsigned int size_y = 100, int default_value = -1){
         this->size_x = size_x;
@@ -225,7 +227,6 @@ public:
         this->plate_default_placement_value = default_value;
         gen_plate(default_value);
         this->objects_on_plate = 0;
-        init_random_seq();
 //        plates_counter ++;
     }
 
@@ -298,11 +299,9 @@ public:
         new_object.set_ref_point(ref_point);
 
         std::vector<POINT> points;
-        int count = 0;
 
         for(auto p : obj.points){
             points.push_back(POINT{p.x + ref_point.x, p.y + ref_point.y});
-            count++;
             this->plate[p.x + ref_point.x][p.y + ref_point.y] = obj.index;
         }
         new_object.points = points;
@@ -332,10 +331,9 @@ public:
         std::cout << "placing" << std::endl;
 
         if (objects_on_plate == 0){
-            this->objects_on_plate++;
             if (obj.boundaries[0] > this->size_x or obj.boundaries[5] > this->size_y){
                 std::cout << "object " << obj.index << " will not fit into plate" << std::endl;
-                return OBJECT_NOT_FIT;
+                return PLACEMENT_ERROR;
             }
             int obj_frame_size_x = obj.body.size();
             int obj_frame_size_y = obj.body[0].size();
@@ -407,7 +405,7 @@ public:
 
             if(free_places.empty()){
                 std::cout << "no more space for new obj" << std::endl;
-                return OBJECT_NOT_FIT;
+                return PLACEMENT_ERROR;
             }
 
             int random_free_point_index = get_random_int(0, free_places.size());
@@ -417,10 +415,29 @@ public:
         }
 
         save_matrix_to_file("plate_after_placing_" + std::to_string(obj.index), plate);
+        objects_on_plate++;
+        this->obj_index_to_list_index[obj.index] = this->objects.size()-1;
+        return GENERAL_SUCCESS;
+    }
+
+    int remove_object_with_index(int index){
+        remove_object_at_index(this->obj_index_to_list_index[index]);
 
         return GENERAL_SUCCESS;
     }
-    
+
+    int remove_object_at_index(int index){
+
+        for(POINT &p : this->objects[index].points){
+            this->plate[p.x][p.y] = -1;
+        }
+
+        objects.erase(objects.begin()+index);
+        this->objects_on_plate--;
+
+        return GENERAL_SUCCESS;
+    }
+
     std::set<POINT> find_edges(Object obj){
         std::set<POINT> possible_candidate;
         bool finding_edge = true;
@@ -484,8 +501,7 @@ public:
 
         return possible_candidate;
     }
-    
-    
+
     void print_boundaries_for_obj(unsigned int index, int width = 2){
         std::vector<std::vector<int>> print_plate(
                 this->size_x,
@@ -519,7 +535,7 @@ public:
             myfile << std::endl;
         }
         myfile.close();
-        std::cout << count << " values != -1" << std::endl;
+//        std::cout << count << " values != -1" << std::endl;
         return 0;
     }
 };

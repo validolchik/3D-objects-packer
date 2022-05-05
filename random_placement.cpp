@@ -12,6 +12,8 @@ int main(int argc, char const *argv[]){
     int plate_size_x = 100;
     int plate_size_y = 100;
 
+    init_random_seq();
+
     std::string file_with_models(argv[1]);
 
     read_filenames(file_with_models);
@@ -72,6 +74,13 @@ int main(int argc, char const *argv[]){
     }
 
     std::cout << "unplaced " << unplaced_objects << " objects" << std::endl;
+
+    plate.remove_object_at_index(plate.objects_on_plate-1);
+    plate.save_matrix_to_file("after_deleting_last", plate.plate);
+    std::cout << plate.objects_on_plate << std::endl;
+
+    plate.remove_object_with_index(0);
+    plate.save_matrix_to_file("after_deleting_with_index0", plate.plate);
 
     return GENERAL_SUCCESS;
 }
