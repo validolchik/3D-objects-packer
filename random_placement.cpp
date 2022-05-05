@@ -60,16 +60,18 @@ int main(int argc, char const *argv[]){
         objects[i].find_edges();
     }
     std::cout << "creating plate" << std::endl;
-    Plate plate(objects[0].boundaries[1] + 90, objects[0].boundaries[5] + 90);
+    Plate plate(objects[0].boundaries[1] * 4, objects[0].boundaries[5] + 10);
     plate.print_plate_info();
 
-    std::cout << "empty grid ? " << objects[0].body.empty() << std::endl;
+    int unplaced_objects = 0;
 
-    plate.place_new_object(objects[0]);
+    for(auto obj : objects){
+        if (plate.place_new_object(obj) == PLACEMENT_ERROR){
+            unplaced_objects++;
+        };
+    }
 
-    plate.save_plate_matrix_to_file("matrix");
-    plate.print_boundaries_for_obj(0);
+    std::cout << "unplaced " << unplaced_objects << " objects" << std::endl;
 
-    plate.place_new_object(objects[1]);
     return GENERAL_SUCCESS;
 }
