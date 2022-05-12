@@ -62,12 +62,16 @@ int main(int argc, char const *argv[]){
         objects[i].find_edges();
     }
     std::cout << "creating plate" << std::endl;
-    Plate plate(objects[0].boundaries[1] * 3, objects[0].boundaries[5] * 3);
+    Plate plate(objects[0].body.size() * 2 + 20, objects[0].body[0].size() * 2 + 20);
     plate.print_plate_info();
 
     int unplaced_objects = 0;
 
     for(auto obj : objects){
+        int rand_int = get_random_int(0, 10);
+        if(rand_int < 5){
+            obj.rotate_object_90_degrees_clockwise();
+        }
 //        obj.rotate_object_90_degrees_clockwise();
         if (plate.place_new_object(obj) == PLACEMENT_ERROR){
             unplaced_objects++;
@@ -76,7 +80,9 @@ int main(int argc, char const *argv[]){
 
     std::cout << "unplaced " << unplaced_objects << " objects" << std::endl;
 
-    plate.remove_object_at_index(plate.objects_on_plate-1);
+    if (plate.remove_object_at_index(plate.objects_on_plate-1)){
+        std::cout << "removed object" << std::endl;
+    }
     plate.save_matrix_to_file("after_deleting_last", plate.plate);
     std::cout << plate.objects_on_plate << std::endl;
 

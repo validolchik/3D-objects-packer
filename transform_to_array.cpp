@@ -8,7 +8,7 @@
 // #include <fstream>
 
 
-float grid_cell_size = 1;
+float grid_cell_size = 0.02;
 
 float half_plane_sign (VERTEX p1, VERTEX p2, VERTEX p3)
 {

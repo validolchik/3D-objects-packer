@@ -193,7 +193,7 @@ public:
 
         //rotate body;
         body = rotate_matrix_clockwise(body);
-        std::cout << "rotating objects" << std::endl;
+        std::cout << "rotating object with index " << index << std::endl;
         std::cout << points[0].x << " " << points[0].y << std::endl;
         //rotate boundary points
         for(auto &point : boundary_points){
@@ -374,10 +374,10 @@ public:
             std::cout << "ERROR!! incorrect body frame received" << std::endl;
             return PLACEMENT_ERROR;
         }
-        std::cout << "placing" << std::endl;
+        std::cout << "placing obj with index " << obj.index  << std::endl;
 
         if (objects_on_plate == 0){
-            if (obj.boundaries[0] > this->size_x or obj.boundaries[5] > this->size_y){
+            if (obj.body.size() > this->size_x or obj.body[0].size() > this->size_y){
                 std::cout << "object " << obj.index << " will not fit into plate" << std::endl;
                 return PLACEMENT_ERROR;
             }
@@ -399,6 +399,7 @@ public:
             // find 4 (or less) point on the boundaries
             // find boundaries of object
 
+            //TODO debug segfault appearing somewhere here
             if (obj.body.empty() or obj.body[0].empty()){
                 std::cout << "Empty object received at placement" << std::endl;
                 return PLACEMENT_ERROR;
@@ -473,6 +474,7 @@ public:
             std::cout << "placing not first object" << std::endl;
 
             POINT placement_point = {x_place, y_place};
+            std::cout << "ref point calculated... placing" << std::endl;
 //            place_object_at_ref_point(obj, free_places[random_free_point_index]);
             place_object_at_ref_point(obj, placement_point);
 //            place_object_at_ref_point(obj, *(free_places.begin()));
@@ -493,7 +495,7 @@ public:
     int remove_object_at_index(int index){
 
         for(POINT &p : this->objects[index].points){
-            this->plate[p.x][p.y] = -1;
+            this->plate[p.x][p.y] = EMPTY_SPACE;
         }
 
         objects.erase(objects.begin()+index);
@@ -587,8 +589,8 @@ public:
         std::cout << "saving boundaries to the file " << output_filename << std::endl;
         myfile.open (output_filename);
         int count = 0;
-        for(auto row : matrix){
-            for(auto value : row){
+        for(auto &row : matrix){
+            for(auto &value : row){
                 if(value != -1){
                     count++;
                     myfile<< std::setw(width) << value << " ";

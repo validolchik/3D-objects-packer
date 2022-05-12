@@ -1,4 +1,5 @@
-models/mario.stl
-models/mario.stl
-models/mario.stl
-models/mario.stl
+models/blah_ascii.stl
+models/blah_ascii.stl
+models/blah_ascii.stl
+models/blah_ascii.stl
+models/blah_ascii.stl
