@@ -12,6 +12,8 @@
 #define RAND_GEN_ERROR 2345
 #define OBJECT_NOT_FIT 3456
 #define OCCUPIED_PLACE 1
+#define EMPTY_SPACE -1
+
 
 #include <iostream>
 #include <iomanip>
@@ -23,6 +25,7 @@
 #include <set>
 #include <map>
 
+#include "helpfull_functions.cpp"
 
 int init_random_seq(){
     srand((unsigned) time(0));
@@ -48,7 +51,7 @@ struct POINT{
 
 inline bool operator<(const POINT& lhs, const POINT& rhs)
 {
-    return lhs.x < rhs.x or lhs.y < rhs.y;
+    return lhs.y < rhs.y or lhs.x > rhs.x;
 }
 
 inline bool operator==(const POINT& lhs, const POINT& rhs)
@@ -84,6 +87,7 @@ public:
     std::vector<POINT> boundary_points; //actual boundaries of object
     std::vector<POINT> points;
     std::set<POINT> edges; //four points in the edges
+    int rotated_clockwise_90_counter = 0;
 
     bool boundary_point(int x, int y, std::vector<std::vector<int>> matrix){
         if (x == 0 or y == 0) return true;
@@ -174,7 +178,48 @@ public:
 
         this->edges = possible_candidate;
     }
-    
+
+    int rotate_object_90_degrees_clockwise(){
+        //TODO turn faces
+
+        // turn boundaries x->z
+        float temp = boundaries[0];
+        boundaries[0] = boundaries[4];
+        boundaries[4] = temp;
+
+        temp = boundaries[1];
+        boundaries[1] = boundaries[5];
+        boundaries[5] = temp;
+
+        //rotate body;
+        body = rotate_matrix_clockwise(body);
+        std::cout << "rotating objects" << std::endl;
+        std::cout << points[0].x << " " << points[0].y << std::endl;
+        //rotate boundary points
+        for(auto &point : boundary_points){
+            unsigned int temp = point.x;
+            point.x = point.y;
+            point.y = boundaries[5] - 1 - temp;
+        }
+
+        //rotate points
+        for(auto &point : points){
+            unsigned int temp = point.x;
+            point.x = point.y;
+            point.y = boundaries[5] - 1 - temp;
+        }
+        std::cout << points[0].x << " " << points[0].y << std::endl;
+        // rotate edges
+        std::set<POINT> temp_set;
+        for (auto itr = edges.begin(); itr != edges.end(); itr++){
+            unsigned int temp = itr->x;
+            POINT p = {itr->y, boundaries[5] - 1 - temp};
+            temp_set.insert(p);
+        }
+        edges = temp_set;
+
+        rotated_clockwise_90_counter++;
+    }
 };
 
 class Object_on_plate{
@@ -184,6 +229,7 @@ public:
     std::vector<POINT> boundary_points; //actual boundaries of object on plate
     std::vector<POINT> points;
     std::set<POINT> edges;
+    int rotated = 0; // how many times rotated
 
     int set_ref_point(int x, int y){
         POINT p = POINT();
@@ -242,7 +288,7 @@ public:
 //        plates_counter --;
     }
 
-    void gen_plate(int default_value = -1){
+    void gen_plate(int default_value = EMPTY_SPACE){
         this->plate = std::vector<std::vector<int>> (
                 this->size_x,
                 std::vector<int>(this->size_y, default_value));
@@ -339,9 +385,12 @@ public:
             int obj_frame_size_y = obj.body[0].size();
             unsigned int x_place = get_random_int(0, this->size_x - obj_frame_size_x);
             unsigned int y_place = get_random_int(0, this->size_y - obj_frame_size_y);
-            std::cout << this->size_x - obj_frame_size_x << " " << this->size_y - obj_frame_size_y << std::endl;
-            std::cout << obj_frame_size_x << " " << obj_frame_size_y << std::endl;
-            std::cout << x_place << " " << y_place << std::endl;
+//            std::cout << this->size_x - obj_frame_size_x << " " << this->size_y - obj_frame_size_y << std::endl;
+
+            x_place = size_x - obj_frame_size_x;
+            y_place = 0;
+            std::cout << "Placing on empty plate new object with sizes: " << obj_frame_size_x << " " << obj_frame_size_y << std::endl;
+            std::cout << "Selected place: (" << x_place << "; " << y_place << ")" << std::endl;
 
             place_object_at_ref_point(obj, POINT{x_place, y_place});
         } else {
@@ -363,13 +412,14 @@ public:
                 }
             }
 
-            for(int i = size_x - obj_frame_size_x; i < size_x; i++){
+            for(int i = size_x - obj_frame_size_x + 1; i < size_x; i++){
                 for (int j = 0; j < size_y- obj_frame_size_y; j++) {
                     unavailable_placement[i][j] = OCCUPIED_PLACE;
                 }
             }
 
             int c = 0;
+
             for(auto &object_on_plate : this->objects){
                 for(auto edge_point : obj.boundary_points){
                     for (auto &boundary_point : object_on_plate.points) {
@@ -395,10 +445,20 @@ public:
             }
             save_matrix_to_file("not_available_places_for_placing_" + std::to_string(obj.index), unavailable_placement);
             std::vector<POINT> free_places;
+//            std::set<POINT> free_places;
+
+            int x_place = 0;
+            int y_place = size_y-1;
+
             for(int i = 0; i < size_x; i++){
                 for(int j = 0; j < size_y; j++){
-                    if (unavailable_placement[i][j] == -1){
+                    if (unavailable_placement[i][j] == EMPTY_SPACE){
+                        if(i > x_place){
+                            x_place = i;
+                            y_place = j;
+                        }
                         free_places.push_back(POINT{i, j});
+//                        free_places.insert(POINT{i, j});
                     }
                 }
             }
@@ -408,10 +468,14 @@ public:
                 return PLACEMENT_ERROR;
             }
 
-            int random_free_point_index = get_random_int(0, free_places.size());
+//            int random_free_point_index = get_random_int(0, free_places.size());
 
             std::cout << "placing not first object" << std::endl;
-            place_object_at_ref_point(obj, free_places[random_free_point_index]);
+
+            POINT placement_point = {x_place, y_place};
+//            place_object_at_ref_point(obj, free_places[random_free_point_index]);
+            place_object_at_ref_point(obj, placement_point);
+//            place_object_at_ref_point(obj, *(free_places.begin()));
         }
 
         save_matrix_to_file("plate_after_placing_" + std::to_string(obj.index), plate);

@@ -62,12 +62,13 @@ int main(int argc, char const *argv[]){
         objects[i].find_edges();
     }
     std::cout << "creating plate" << std::endl;
-    Plate plate(objects[0].boundaries[1] * 4, objects[0].boundaries[5] + 10);
+    Plate plate(objects[0].boundaries[1] * 3, objects[0].boundaries[5] * 3);
     plate.print_plate_info();
 
     int unplaced_objects = 0;
 
     for(auto obj : objects){
+//        obj.rotate_object_90_degrees_clockwise();
         if (plate.place_new_object(obj) == PLACEMENT_ERROR){
             unplaced_objects++;
         };
