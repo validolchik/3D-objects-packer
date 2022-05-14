@@ -12,7 +12,7 @@ float grid_cell_size = 0.02;
 
 float half_plane_sign (VERTEX p1, VERTEX p2, VERTEX p3)
 {
-    return (p1.x - p3.x) * (p2.z - p3.z) - (p2.x - p3.x) * (p1.z - p3.z);
+    return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
 }
 
 bool point_in_triangle (VERTEX pt, VERTEX v1, VERTEX v2, VERTEX v3)
@@ -32,7 +32,7 @@ bool point_in_triangle (VERTEX pt, VERTEX v1, VERTEX v2, VERTEX v3)
 
 std::vector<std::vector<int>> produce_empty_body_grid(Object obj){
 	int rows = int((obj.boundaries[1] - obj.boundaries[0] + grid_cell_size) / grid_cell_size); 
-	int columns = int((obj.boundaries[5] - obj.boundaries[4] + grid_cell_size) / grid_cell_size);
+	int columns = int((obj.boundaries[3] - obj.boundaries[2] + grid_cell_size) / grid_cell_size);
 
 	std::cout << "grid size" << std::endl;
 	std::cout << rows << " " << columns << std::endl;
@@ -47,12 +47,12 @@ std::vector<std::vector<int>> produce_empty_body_grid(Object obj){
 }
 
 std::vector<float> find_square_bounds_of_triangle(FACE f){
-	std::vector<float> boundaries = {f.vertices[0].x, f.vertices[0].x, f.vertices[0].z, f.vertices[0].z};
+	std::vector<float> boundaries = {f.vertices[0].x, f.vertices[0].x, f.vertices[0].y, f.vertices[0].y};
 	for (int i = 0; i < f.vertices.size(); ++i){
 		boundaries[0] = std::min(boundaries[0], f.vertices[i].x);
 		boundaries[1] = std::max(boundaries[1], f.vertices[i].x);
-		boundaries[2] = std::min(boundaries[2], f.vertices[i].z);
-		boundaries[3] = std::max(boundaries[3], f.vertices[i].z);
+		boundaries[2] = std::min(boundaries[2], f.vertices[i].y);
+		boundaries[3] = std::max(boundaries[3], f.vertices[i].y);
 	}
 
 	return boundaries;
@@ -93,12 +93,12 @@ std::vector<std::vector<int>> fill_body_grid(Object obj, std::vector<std::vector
 		{
 			for (int k = y_min_grid; k < y_max_grid; ++k)
 			{
-				VERTEX p = {j*grid_cell_size, 0, k*grid_cell_size};
+				VERTEX p = {j*grid_cell_size, k*grid_cell_size, 0};
 //				 std::cout << "test point " << p.x << " " << p.y << " " << p.z << std::endl;
 //				 std::cout << k << ' ' << j << std::endl;
 				if (point_in_triangle(p, v0, v1, v2)){
 					if (empty_grid[j][k] != -1) inside_count++;
-					empty_grid[j][k] = int(std::min(std::min(v0.y, v1.y), v2.y));
+					empty_grid[j][k] = int(std::min(std::min(v0.z, v1.z), v2.z));
 					// empty_grid[j+1][k] = true;
 					// empty_grid[j+1][k] = true;
 					// empty_grid[j+1][k+1] = true;//fix the indexes here

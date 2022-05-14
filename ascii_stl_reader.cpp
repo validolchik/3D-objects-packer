@@ -73,11 +73,10 @@ std::vector<float> find_boundaries(std::vector<FACE> faces){
 
 int process_stl_file(std::string filename){
 	std::string line;
-	int facet_count = 0;
 	bool reading_facet = false;
 	std::vector<std::string> facet_block;
 
-    std::cout << std::endl << "opening the " << filename << std::endl;
+    std::cout << std::endl << "Opening the " << filename << std::endl;
 
 	std::ifstream myfile (filename);
 	if (myfile.is_open()){
