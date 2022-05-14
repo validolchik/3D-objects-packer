@@ -354,8 +354,22 @@ public:
         std::vector<POINT> points;
 
         for(auto p : obj.points){
-            points.push_back(POINT{p.x + ref_point.x, p.y + ref_point.y});
-            this->plate[p.x + ref_point.x][p.y + ref_point.y] = obj.index;
+            unsigned int x = p.x + ref_point.x;
+            unsigned int y = p.y + ref_point.y;
+            if (plate[x][y] != EMPTY_SPACE){
+                return PLACEMENT_ERROR;
+            }
+        }
+
+        for(auto p : obj.points){
+            unsigned int x = p.x + ref_point.x;
+            unsigned int y = p.y + ref_point.y;
+            points.push_back(POINT{x, y});
+            if (plate[x][y] != EMPTY_SPACE){
+                return PLACEMENT_ERROR;
+            } else{
+                plate[x][y] = obj.index;
+            }
         }
         new_object.points = points;
 
@@ -399,14 +413,14 @@ public:
             std::cout << "Placing on empty plate new object with sizes: " << obj_frame_size_x << " " << obj_frame_size_y << std::endl;
             std::cout << "Selected place: (" << x_place << "; " << y_place << ")" << std::endl;
 
-            place_object_at_ref_point(obj, POINT{x_place, y_place});
+            if (place_object_at_ref_point(obj, POINT{x_place, y_place}) == PLACEMENT_ERROR){
+                std::cout << "ERROR! Placement first model is broken" << std::endl;
+            }
         } else {
-            std::vector<std::vector<int>> unavailable_placement = this->plate;
-            // take 4 ref points and follow them through boundaries of each object
-            // find 4 (or less) point on the boundaries
-            // find boundaries of object
+//            std::vector<std::vector<int>> unavailable_placement = this->plate;
+            std::vector<std::vector<int>> unavailable_placement (size_x,
+                                                                 std::vector<int>(size_y, EMPTY_SPACE));
 
-            //TODO debug segfault appearing somewhere here
             if (obj.body.empty() or obj.body[0].empty()){
                 std::cout << "Empty object received at placement" << std::endl;
                 return PLACEMENT_ERROR;
@@ -442,10 +456,10 @@ public:
                         };
                         int x = bp_new_obj_absolute.x;
                         int y = bp_new_obj_absolute.y;
-                        if (x < 0 or y < 0 or new_obj_ref_point.x < 0 or new_obj_ref_point.y < 0) continue;
-                        if (unavailable_placement[x][y] != -1 and unavailable_placement[x][y] != 0){
+                        if (new_obj_ref_point.x < 0 or new_obj_ref_point.y < 0) continue;
+//                        if (unavailable_placement[x][y] != EMPTY_SPACE){
                             unavailable_placement[new_obj_ref_point.x][new_obj_ref_point.y] = OCCUPIED_PLACE;
-                        }
+//                        }
                     }
                     std::string step = std::to_string(c);
                     c++;
@@ -455,13 +469,13 @@ public:
             std::vector<POINT> free_places;
 //            std::set<POINT> free_places;
 
-            int x_place = 0;
-            int y_place = size_y-1;
+            int x_place = -1;
+            int y_place = size_y;
 
             for(int i = 0; i < size_x; i++){
                 for(int j = 0; j < size_y; j++){
                     if (unavailable_placement[i][j] == EMPTY_SPACE){
-                        if(i > x_place){
+                        if(j <= y_place){
                             x_place = i;
                             y_place = j;
                         }
@@ -469,6 +483,11 @@ public:
 //                        free_places.insert(POINT{i, j});
                     }
                 }
+            }
+
+            if (x_place == -1 or y_place == size_y){
+                std::cout << "no more space for new obj" << std::endl;
+                return PLACEMENT_ERROR;
             }
 
             if(free_places.empty()){
@@ -482,9 +501,9 @@ public:
 
             POINT placement_point = {x_place, y_place};
             std::cout << "ref point calculated... placing" << std::endl;
-//            place_object_at_ref_point(obj, free_places[random_free_point_index]);
-            place_object_at_ref_point(obj, placement_point);
-//            place_object_at_ref_point(obj, *(free_places.begin()));
+            if (place_object_at_ref_point(obj, placement_point) == PLACEMENT_ERROR){
+                std::cout << "ERROR! ref point calculated wrong, objects collide\n Object unplaced" << std::endl;
+            };
         }
 
         save_matrix_to_file("plate_after_placing_" + std::to_string(obj.index), plate);

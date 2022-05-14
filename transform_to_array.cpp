@@ -8,7 +8,8 @@
 // #include <fstream>
 
 
-float grid_cell_size = 0.02;
+float grid_cell_size = 0.005; //in m
+// typical size of plate is 0.22 m
 
 float half_plane_sign (VERTEX p1, VERTEX p2, VERTEX p3)
 {

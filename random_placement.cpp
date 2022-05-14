@@ -4,8 +4,10 @@
 
 //#include "classes.h"
 //#include <iostream>
-#include "ascii_stl_reader.cpp"
-#include "transform_to_array.cpp"
+//#include "ascii_stl_reader.cpp"
+//#include "transform_to_array.cpp"
+#include "reading_transformation.cpp"
+
 
 int main(int argc, char const *argv[]){
     int default_plate_value = 0;
@@ -14,56 +16,9 @@ int main(int argc, char const *argv[]){
 
     init_random_seq();
 
-    std::string file_with_models(argv[1]);
+    int reading_processing_status = read_transform_files(argv[1]);
+    std::cout << "Reading and processing files status is " << reading_processing_status << std::endl;
 
-    read_filenames(file_with_models);
-
-    for (int i = 0; i < models_filenames.size(); i++){
-        process_stl_file(models_filenames[i]);
-        std::cout << models_filenames[i] << " processed" << std::endl;
-
-        objects[i].index = i;
-
-        shift_object_to_zero(objects[i]);
-        objects[i].boundaries = find_boundaries(objects[i].object_faces);
-
-        std::cout << "boundaries after shift: ";
-        for (float b : objects[i].boundaries) std::cout << b << " ";
-        std::cout << std::endl;
-
-        std::vector<std::vector<int>> grid = produce_empty_body_grid(objects[i]);
-        std::cout << "empty_grid produced" << std::endl;
-        std::cout << "empty ?"<< grid.empty() << std::endl;
-
-        grid = fill_body_grid(objects[i], grid);
-        std::cout << "grid filled" << std::endl;
-
-        assign_body_grid(objects[i], grid);
-        std::cout << "assigned grid to the body" << std::endl;
-        std::cout << "body size: " << objects[i].body.size() << std::endl;
-
-        std::vector<POINT> points;
-        std::vector<POINT> boundary_points;
-        for(size_t x = 0; x < objects[i].body.size(); x++){
-            for(size_t y = 0; y < objects[i].body[x].size(); y++){
-                if (objects[i].body[x][y] != -1){
-                    points.push_back(POINT{int(x), int(y)});
-                    if(objects[i].boundary_point(int(x), int(y), objects[i].body)){
-                        boundary_points.push_back(POINT{int(x), int(y)});
-                    }
-                }
-            }
-        }
-//        print_2d_matrix_in_console(objects[i].body);
-        std::cout << "point array created" << std::endl;
-        objects[i].points = points;
-        std::cout << "assigned" << std::endl;
-        objects[i].boundary_points = boundary_points;
-        std::cout << "object body size: " << objects[i].points.size() << std::endl;
-        std::cout << "object boundary points size: " << objects[i].boundary_points.size() << std::endl;
-
-        objects[i].find_edges();
-    }
     std::cout << "creating plate" << std::endl;
     Plate plate(objects[0].body.size() * 2 + 20, objects[0].body[0].size() * 2 + 20);
     plate.print_plate_info(grid_cell_size);
@@ -81,7 +36,7 @@ int main(int argc, char const *argv[]){
     }
 
     std::cout << "unplaced " << unplaced_objects << " objects" << std::endl;
-
+    std::cout << "placed " << plate.objects.size() << std::endl;
     if (plate.remove_object_at_index(plate.objects_on_plate-1)){
         std::cout << "removed object" << std::endl;
     }
