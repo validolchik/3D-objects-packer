@@ -194,26 +194,30 @@ public:
         //rotate body;
         body = rotate_matrix_clockwise(body);
         std::cout << "rotating object with index " << index << std::endl;
+
+        std::cout << "point 0 coordinates before" << std::endl;
         std::cout << points[0].x << " " << points[0].y << std::endl;
         //rotate boundary points
         for(auto &point : boundary_points){
             unsigned int temp = point.x;
             point.x = point.y;
-            point.y = boundaries[5] - 1 - temp;
+            point.y = body[0].size() - 1 - temp;
         }
 
         //rotate points
         for(auto &point : points){
             unsigned int temp = point.x;
             point.x = point.y;
-            point.y = boundaries[5] - 1 - temp;
+            point.y = body[0].size() - 1 - temp;
         }
+
+        std::cout << "point 0 coordinates after" << std::endl;
         std::cout << points[0].x << " " << points[0].y << std::endl;
         // rotate edges
         std::set<POINT> temp_set;
         for (auto itr = edges.begin(); itr != edges.end(); itr++){
             unsigned int temp = itr->x;
-            POINT p = {itr->y, boundaries[5] - 1 - temp};
+            POINT p = {itr->y, body[0].size() - 1 - temp};
             temp_set.insert(p);
         }
         edges = temp_set;
@@ -276,10 +280,13 @@ public:
 //        plates_counter ++;
     }
 
-    void print_plate_info(){
+    void print_plate_info(float cell_size){
+        std::cout << "----------info about plate----------" << std::endl;
         std::cout << this->objects_on_plate << " obj on plate" << std::endl;
-        std::cout << "x : " << this->size_x << std::endl;
-        std::cout << "y : " << this->size_y << std::endl;
+        std::cout << "size_x : " << this->size_x << std::endl;
+        std::cout << "size_y : " << this->size_y << std::endl;
+        std::cout << "sizes in cm: " << size_x * cell_size << " " << size_y * cell_size << std::endl;
+        std::cout << "------------------------------------" << std::endl;
     }
 
     virtual ~Plate()

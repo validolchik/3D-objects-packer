@@ -63,13 +63,12 @@ int main(int argc, char const *argv[]){
     }
     std::cout << "creating plate" << std::endl;
     Plate plate(objects[0].body.size() * 2 + 20, objects[0].body[0].size() * 2 + 20);
-    plate.print_plate_info();
+    plate.print_plate_info(grid_cell_size);
 
     int unplaced_objects = 0;
 
     for(auto obj : objects){
-        int rand_int = get_random_int(0, 10);
-        if(rand_int < 5){
+        if(get_random_int(0, 10) < 5){
             obj.rotate_object_90_degrees_clockwise();
         }
 //        obj.rotate_object_90_degrees_clockwise();

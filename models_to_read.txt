@@ -1,5 +1,5 @@
-models/blah_ascii.stl
-models/blah_ascii.stl
-models/blah_ascii.stl
-models/blah_ascii.stl
-models/blah_ascii.stl
+models/self_created_models/blah_ascii.stl
+models/self_created_models/blah_ascii.stl
+models/self_created_models/blah_ascii.stl
+models/self_created_models/blah_ascii.stl
+models/self_created_models/blah_ascii.stl
