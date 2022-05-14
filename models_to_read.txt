@@ -1,4 +1,10 @@
 models/self_created_models/blah_ascii.stl
+models/self_created_models/shoulder_def_ascii.stl
+models/self_created_models/shoulder_def_ascii.stl
+models/self_created_models/shoulder_def_ascii.stl
+models/self_created_models/shoulder_def_ascii.stl
+models/self_created_models/shoulder_def_ascii.stl
+models/self_created_models/shoulder_def_ascii.stl
 models/self_created_models/blah_ascii.stl
 models/self_created_models/blah_ascii.stl
 models/self_created_models/blah_ascii.stl
