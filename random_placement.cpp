@@ -40,7 +40,7 @@ int main(int argc, char const *argv[]){
 
         assign_body_grid(objects[i], grid);
         std::cout << "assigned grid to the body" << std::endl;
-        std::cout << objects[i].body.empty() << " empty?" << std::endl;
+        std::cout << "body size: " << objects[i].body.size() << std::endl;
 
         std::vector<POINT> points;
         std::vector<POINT> boundary_points;
@@ -54,10 +54,13 @@ int main(int argc, char const *argv[]){
                 }
             }
         }
+//        print_2d_matrix_in_console(objects[i].body);
+        std::cout << "point array created" << std::endl;
         objects[i].points = points;
+        std::cout << "assigned" << std::endl;
         objects[i].boundary_points = boundary_points;
-        std::cout << objects[i].points.size() << std::endl;
-        std::cout << objects[i].boundary_points.size() << std::endl;
+        std::cout << "object body size: " << objects[i].points.size() << std::endl;
+        std::cout << "object boundary points size: " << objects[i].boundary_points.size() << std::endl;
 
         objects[i].find_edges();
     }
