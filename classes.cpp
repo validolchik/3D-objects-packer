@@ -27,22 +27,7 @@
 
 #include "helpfull_functions.cpp"
 
-int init_random_seq(){
-    srand((unsigned) time(0));
-    return RAND_GEN_ERROR;
-}
 
-int get_random_int(int start = 0, int finish = 10){
-    if (start <= finish) {
-        return start + rand() % finish;
-    }else return RAND_GEN_ERROR;
-}
-
-bool is_path_exist(const std::string &s)
-{
-    struct stat buffer;
-    return (stat (s.c_str(), &buffer) == 0);
-}
 
 struct POINT{
     int x;
@@ -289,6 +274,14 @@ public:
         std::cout << "------------------------------------" << std::endl;
     }
 
+    void print_plate_info(){
+        std::cout << "----------info about plate----------" << std::endl;
+        std::cout << this->objects_on_plate << " obj on plate" << std::endl;
+        std::cout << "size_x : " << this->size_x << std::endl;
+        std::cout << "size_y : " << this->size_y << std::endl;
+        std::cout << "------------------------------------" << std::endl;
+    }
+
     virtual ~Plate()
     {
         ;
@@ -386,7 +379,7 @@ public:
         return GENERAL_SUCCESS;
     }
 
-    int place_new_object(Object obj){
+    int place_new_object(Object obj, bool info = false){
         if (obj.body.empty()){
             std::cout << "ERROR!! empty body in object received" << std::endl;
             return PLACEMENT_ERROR;
@@ -410,12 +403,14 @@ public:
 
             x_place = size_x - obj_frame_size_x;
             y_place = 0;
-            std::cout << "Placing on empty plate new object with sizes: " << obj_frame_size_x << " " << obj_frame_size_y << std::endl;
-            std::cout << "Selected place: (" << x_place << "; " << y_place << ")" << std::endl;
 
             if (place_object_at_ref_point(obj, POINT{x_place, y_place}) == PLACEMENT_ERROR){
                 std::cout << "ERROR! Placement first model is broken" << std::endl;
             }
+
+            std::cout << "Placed on empty plate new object with sizes: " << obj_frame_size_x << " " << obj_frame_size_y << std::endl;
+            std::cout << "Selected place: (" << x_place << "; " << y_place << ")" << std::endl;
+
         } else {
 //            std::vector<std::vector<int>> unavailable_placement = this->plate;
             std::vector<std::vector<int>> unavailable_placement (size_x,
@@ -465,7 +460,7 @@ public:
                     c++;
                 }
             }
-            save_matrix_to_file("not_available_places_for_placing_" + std::to_string(obj.index), unavailable_placement);
+//            save_matrix_to_file("occupied_obj_ind_" + std::to_string(obj.index) + "_" + std::to_string(objects_on_plate), unavailable_placement);
             std::vector<POINT> free_places;
 //            std::set<POINT> free_places;
 
@@ -506,18 +501,20 @@ public:
             };
         }
 
-        save_matrix_to_file("plate_after_placing_" + std::to_string(obj.index), plate);
+//        save_matrix_to_file("plate_after_placing_ind" + std::to_string(obj.index) + "_" + std::to_string(objects_on_plate), plate);
         objects_on_plate++;
         this->obj_index_to_list_index[obj.index] = this->objects.size()-1;
         return GENERAL_SUCCESS;
     }
 
+    //TODO fix remove unplaced objects
     int remove_object_with_index(int index){
         remove_object_at_index(this->obj_index_to_list_index[index]);
 
         return GENERAL_SUCCESS;
     }
 
+    //TODO fix remove unplaced objects
     int remove_object_at_index(int index){
 
         for(POINT &p : this->objects[index].points){
@@ -604,31 +601,50 @@ public:
         std::cout << "boundary points " << objects[index].boundary_points.size() << std::endl;
         save_matrix_to_file("boundaries", print_plate);
     }
-
-    int save_matrix_to_file(std::string filename, std::vector<std::vector<int>> matrix, int width = 2){
-        std::ofstream myfile;
-        std::string representations_dir = "plate_matrices";
-        if(!is_path_exist(representations_dir)){
-            mkdir(&representations_dir[0], S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-        }
-        std::string output_filename = representations_dir + "/" + filename;
-        std::cout << "saving boundaries to the file " << output_filename << std::endl;
-        myfile.open (output_filename);
-        int count = 0;
-        for(auto &row : matrix){
-            for(auto &value : row){
-                if(value != -1){
-                    count++;
-                    myfile<< std::setw(width) << value << " ";
-                }else{
-                    myfile << std::setw(width) << "_" << " ";
-                }
-            }
-            myfile << std::endl;
-        }
-        myfile.close();
-//        std::cout << count << " values != -1" << std::endl;
-        return 0;
-    }
 };
 
+class Individual{
+public:
+    int ind_index;
+    Plate ind_plate;
+    std::vector<int> chromosome;
+
+    Individual(int index, std::vector<int> chromo, Plate plate){
+        ind_index = index;
+        chromosome = chromo;
+        ind_plate = plate;
+    }
+
+    int mutation(std::vector<Object> &objects){
+        int first_gen = get_random_int(0, chromosome.size());
+        int second_gen = get_random_int(0, chromosome.size());
+        while(second_gen == first_gen){
+            second_gen = get_random_int(0, chromosome.size());
+        }
+
+        //swap
+        int temp = chromosome[first_gen];
+        chromosome[first_gen] = chromosome[second_gen];
+        chromosome[second_gen] = temp;
+
+        ind_plate.print_plate_info();
+        //delete objects from plate
+        int x = ind_plate.size_x;
+        int y = ind_plate.size_y;
+        Plate new_plate(x, y);
+        ind_plate = new_plate;
+        ind_plate.print_plate_info();
+
+        // fill plate again
+        for(int index : chromosome){
+
+            Object obj = objects[index];
+            int rotate_count = get_random_int(0, 3);
+            if (ind_plate.place_new_object(obj) == PLACEMENT_ERROR){
+                std::cout << "genes not placed" << std::endl;
+            }
+        }
+
+    }
+
+};
