@@ -412,7 +412,7 @@ public:
             std::cout << "Selected place: (" << x_place << "; " << y_place << ")" << std::endl;
 
         } else {
-//            std::vector<std::vector<int>> unavailable_placement = this->plate;
+            //std::vector<std::vector<int>> unavailable_placement = this->plate;
             std::vector<std::vector<int>> unavailable_placement (size_x,
                                                                  std::vector<int>(size_y, EMPTY_SPACE));
 
@@ -607,36 +607,69 @@ class Individual{
 public:
     int ind_index;
     Plate ind_plate;
-    std::vector<int> chromosome;
+    std::vector<int> ind_chromosome;
 
     Individual(int index, std::vector<int> chromo, Plate plate){
         ind_index = index;
-        chromosome = chromo;
+        ind_chromosome = chromo;
         ind_plate = plate;
     }
 
+    Individual(int index, std::vector<Object> &objects){
+        std::cout << "creating new individ" << std::endl;
+        Plate plate(objects[0].body.size() * 2 + 20, objects[0].body[0].size() * 2 + 20);
+
+        int unplaced_objects = 0;
+
+        std::vector<int> indexes_shuffle;
+        for(int i = 0; i < objects.size(); i++){
+            indexes_shuffle.push_back(i);
+        }
+        shuffle_int_vector(indexes_shuffle);
+
+        std::vector<int> chromosome;
+
+        for(int index : indexes_shuffle){
+            Object &obj = objects[index];
+            int rotate_count = get_random_int(0, 3);
+            std::cout << "rotating " << rotate_count << "times" <<std::endl;
+            for(int i = 0; i < rotate_count; i++){
+                obj.rotate_object_90_degrees_clockwise();
+            }
+            if (plate.place_new_object(obj) == PLACEMENT_ERROR){
+                unplaced_objects++;
+            } else{
+                chromosome.push_back(index);
+            }
+        }
+        
+        ind_plate = plate;
+        ind_index = index;
+        ind_chromosome = chromosome;
+    }
+
     int mutation(std::vector<Object> &objects){
-        int first_gen = get_random_int(0, chromosome.size());
-        int second_gen = get_random_int(0, chromosome.size());
+        int first_gen = get_random_int(0, ind_chromosome.size());
+        int second_gen = get_random_int(0, ind_chromosome.size());
         while(second_gen == first_gen){
-            second_gen = get_random_int(0, chromosome.size());
+            second_gen = get_random_int(0, ind_chromosome.size());
         }
 
         //swap
-        int temp = chromosome[first_gen];
-        chromosome[first_gen] = chromosome[second_gen];
-        chromosome[second_gen] = temp;
+        int temp = ind_chromosome[first_gen];
+        ind_chromosome[first_gen] = ind_chromosome[second_gen];
+        ind_chromosome[second_gen] = temp;
 
-        ind_plate.print_plate_info();
+//        ind_plate.print_plate_info();
         //delete objects from plate
         int x = ind_plate.size_x;
         int y = ind_plate.size_y;
         Plate new_plate(x, y);
         ind_plate = new_plate;
-        ind_plate.print_plate_info();
+//        ind_plate.print_plate_info();
 
         // fill plate again
-        for(int index : chromosome){
+        for(int index : ind_chromosome){
 
             Object obj = objects[index];
             int rotate_count = get_random_int(0, 3);
@@ -647,4 +680,27 @@ public:
 
     }
 
+    std::vector<Individual> crossover(Individual &second){
+        std::vector<Individual> result;
+
+        int min_length = std::min(ind_chromosome.size(), second.ind_chromosome.size());
+
+        int swap_start = get_random_int(0, min_length);
+        int swap_finish = get_random_int(swap_start, min_length);
+        
+        std::cout << "min len " << min_length << " swap start " << swap_start << " swap finish " << swap_finish << std::endl;
+        std::cout << "lenghts " << ind_chromosome.size() << " " << second.ind_chromosome.size() << std::endl;
+        
+    }
+
+    void print_individual_info(){
+        std::cout << "--------------Individ-----------" << std::endl;
+        std::cout << "index " << ind_index << std::endl;
+        std::cout << "ind plate info" << std::endl;
+        ind_plate.print_plate_info();
+        std::cout << "chromosome size " << ind_chromosome.size() << std::endl;
+        std::cout << "chromosome ";
+        for(auto c : ind_chromosome) std::cout << c << " ";
+        std::cout << std::endl;
+    }
 };
