@@ -37,17 +37,25 @@ int read_transform_files(const char* filename_models){
 
         std::vector<POINT> points;
         std::vector<POINT> boundary_points;
+        int weight_center_x = 0;
+        int weight_center_y = 0;
         for(size_t x = 0; x < objects[i].body.size(); x++){
             for(size_t y = 0; y < objects[i].body[x].size(); y++){
                 if (objects[i].body[x][y] != -1){
                     points.push_back(POINT{int(x), int(y)});
+                    weight_center_x += x;
+                    weight_center_y += y;
                     if(objects[i].boundary_point(int(x), int(y), objects[i].body)){
                         boundary_points.push_back(POINT{int(x), int(y)});
                     }
                 }
             }
         }
+        weight_center_x /= points.size();
+        weight_center_y /= points.size();
+
 //        print_2d_matrix_in_console(objects[i].body);
+        objects[i].weight_center = {weight_center_x, weight_center_y};
         std::cout << "point array created" << std::endl;
         objects[i].points = points;
         std::cout << "assigned" << std::endl;

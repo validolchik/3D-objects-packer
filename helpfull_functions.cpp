@@ -2,20 +2,29 @@
 // Created by renat on 10.05.22.
 //
 
+#include <fstream>
 #include <cstdlib>
 #include <vector>
 #include <algorithm>    // std::shuffle
 #include <random>       // std::default_random_engine
 #include <chrono>
+#include <iostream>
+#include <iomanip>
+#include <sys/stat.h>
+#include <math.h>
+
+
+#define RAND_GEN_ERROR 2345
 
 int init_random_seq(){
     srand((unsigned) time(0));
     return RAND_GEN_ERROR;
 }
 
-int get_random_int(int start = 0, int finish = 10){
-    if (start <= finish) {
-        return start + rand() % finish;
+
+int get_random_int(int start = 0, int buffer = 10){
+    if (buffer >= 0) {
+        return start + rand() % buffer;
     }else return RAND_GEN_ERROR;
 }
 

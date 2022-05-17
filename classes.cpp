@@ -27,12 +27,18 @@
 
 #include "helpfull_functions.cpp"
 
-
-
 struct POINT{
     int x;
     int y;
 };
+
+float calculate_distance(POINT p1, POINT p2){
+
+    int x_d = (p1.x - p2.x);
+    int y_d = (p1.y - p2.y);
+
+    return sqrt(x_d * x_d + y_d * y_d);
+}
 
 inline bool operator<(const POINT& lhs, const POINT& rhs)
 {
@@ -73,6 +79,7 @@ public:
     std::vector<POINT> points;
     std::set<POINT> edges; //four points in the edges
     int rotated_clockwise_90_counter = 0;
+    POINT weight_center;
 
     bool boundary_point(int x, int y, std::vector<std::vector<int>> matrix){
         if (x == 0 or y == 0) return true;
@@ -218,6 +225,7 @@ public:
     std::vector<POINT> boundary_points; //actual boundaries of object on plate
     std::vector<POINT> points;
     std::set<POINT> edges;
+    POINT weight_center;
     int rotated = 0; // how many times rotated
 
     int set_ref_point(int x, int y){
@@ -374,6 +382,8 @@ public:
             new_object.edges.insert(POINT{p.x + ref_point.x, p.y + ref_point.y});
         }
 
+        new_object.weight_center = POINT{obj.weight_center.x + ref_point.x, obj.weight_center.y + ref_point.y};
+
         this->objects.push_back(new_object);
 
         return GENERAL_SUCCESS;
@@ -388,7 +398,9 @@ public:
             std::cout << "ERROR!! incorrect body frame received" << std::endl;
             return PLACEMENT_ERROR;
         }
-        std::cout << "placing obj with index " << obj.index  << std::endl;
+        if (info){
+            std::cout << "placing obj with index " << obj.index  << std::endl;
+        }
 
         if (objects_on_plate == 0){
             if (obj.body.size() > this->size_x or obj.body[0].size() > this->size_y){
@@ -408,8 +420,11 @@ public:
                 std::cout << "ERROR! Placement first model is broken" << std::endl;
             }
 
-            std::cout << "Placed on empty plate new object with sizes: " << obj_frame_size_x << " " << obj_frame_size_y << std::endl;
-            std::cout << "Selected place: (" << x_place << "; " << y_place << ")" << std::endl;
+            if (info){
+                std::cout << "Placed on empty plate new object with sizes: " << obj_frame_size_x << " " << obj_frame_size_y << std::endl;
+                std::cout << "Selected place: (" << x_place << "; " << y_place << ")" << std::endl;
+            }
+
 
         } else {
             //std::vector<std::vector<int>> unavailable_placement = this->plate;
@@ -492,10 +507,13 @@ public:
 
 //            int random_free_point_index = get_random_int(0, free_places.size());
 
-            std::cout << "placing not first object" << std::endl;
-
             POINT placement_point = {x_place, y_place};
-            std::cout << "ref point calculated... placing" << std::endl;
+
+            if(info){
+                std::cout << "placing not first object" << std::endl;
+                std::cout << "ref point calculated... placing" << std::endl;
+            }
+
             if (place_object_at_ref_point(obj, placement_point) == PLACEMENT_ERROR){
                 std::cout << "ERROR! ref point calculated wrong, objects collide\n Object unplaced" << std::endl;
             };
@@ -605,17 +623,19 @@ public:
 
 class Individual{
 public:
+    static int ind_count;
     int ind_index;
     Plate ind_plate;
     std::vector<int> ind_chromosome;
 
-    Individual(int index, std::vector<int> chromo, Plate plate){
-        ind_index = index;
+    Individual(std::vector<int> chromo, Plate plate){
+        ind_count++;
+        ind_index = ind_count;
         ind_chromosome = chromo;
         ind_plate = plate;
     }
 
-    Individual(int index, std::vector<Object> &objects){
+    Individual(std::vector<Object> &objects){
         std::cout << "creating new individ" << std::endl;
         Plate plate(objects[0].body.size() * 2 + 20, objects[0].body[0].size() * 2 + 20);
 
@@ -642,9 +662,34 @@ public:
                 chromosome.push_back(index);
             }
         }
-        
+
+        ind_count++;
+        ind_index = ind_count;
         ind_plate = plate;
-        ind_index = index;
+        ind_chromosome = chromosome;
+    }
+
+    Individual(std::vector<int> chromo, std::vector<Object> &objects){
+        std::cout << "creating new individ" << std::endl;
+        Plate plate(objects[0].body.size() * 2 + 20, objects[0].body[0].size() * 2 + 20);
+
+        int unplaced_objects = 0;
+
+        std::vector<int> chromosome;
+
+        for(int index : chromo){
+            Object &obj = objects[index];
+            if (plate.place_new_object(obj) == PLACEMENT_ERROR){
+                unplaced_objects++;
+            }else{
+                chromosome.push_back(index);
+            }
+
+        }
+
+        ind_count++;
+        ind_index = ind_count;
+        ind_plate = plate;
         ind_chromosome = chromosome;
     }
 
@@ -672,7 +717,6 @@ public:
         for(int index : ind_chromosome){
 
             Object obj = objects[index];
-            int rotate_count = get_random_int(0, 3);
             if (ind_plate.place_new_object(obj) == PLACEMENT_ERROR){
                 std::cout << "genes not placed" << std::endl;
             }
@@ -680,17 +724,69 @@ public:
 
     }
 
-    std::vector<Individual> crossover(Individual &second){
+    std::vector<Individual> crossover(Individual &second, std::vector<Object> &objects){
         std::vector<Individual> result;
 
         int min_length = std::min(ind_chromosome.size(), second.ind_chromosome.size());
 
         int swap_start = get_random_int(0, min_length);
-        int swap_finish = get_random_int(swap_start, min_length);
+        int swap_finish = get_random_int(swap_start, min_length-swap_start) + 1;
         
         std::cout << "min len " << min_length << " swap start " << swap_start << " swap finish " << swap_finish << std::endl;
         std::cout << "lenghts " << ind_chromosome.size() << " " << second.ind_chromosome.size() << std::endl;
-        
+
+        // copy objects selected for placement in local array and only then rotate them
+        // after GA is done, rotate the STL, and combine the whole file
+        std::vector<int> first_child;
+
+        std::map<int, int> first_child_map;
+
+        for(int i = swap_start; i < swap_finish; i++){
+            first_child.push_back(ind_chromosome[i]);
+            first_child_map[ind_chromosome[i]] = 1;
+        }
+
+        for(int value : second.ind_chromosome){
+            if( first_child_map.count(value) == 0){
+                first_child_map[value] = 1;
+                first_child.push_back(value);
+            }
+        }
+
+        std::cout << "first child ";
+        for(int value : first_child){
+            std::cout << value << " ";
+        }
+        std::cout << std::endl;
+
+        result.push_back(Individual(first_child, objects));
+
+        std::vector<int> second_child;
+        std::map<int, int> second_child_map;
+
+        for(int i = 0; i < ind_chromosome.size(); i++){
+            if(i < swap_start or i >= swap_finish){
+                second_child.push_back(ind_chromosome[i]);
+                second_child_map[ind_chromosome[i]] = 1;
+            }
+        }
+
+        for(int value : second.ind_chromosome){
+            if( second_child_map.count(value) == 0){
+                second_child_map[value] = 1;
+                second_child.push_back(value);
+            }
+        }
+
+        std::cout << "second child ";
+        for(int value : second_child){
+            std::cout << value << " ";
+        }
+        std::cout << std::endl;
+
+        result.push_back(Individual(second_child, objects));
+
+        return result;
     }
 
     void print_individual_info(){
@@ -702,5 +798,26 @@ public:
         std::cout << "chromosome ";
         for(auto c : ind_chromosome) std::cout << c << " ";
         std::cout << std::endl;
+    }
+
+    float get_fitness(){
+        float fitness = 0;
+
+        for(Object_on_plate &obj_on_plate : ind_plate.objects){
+            fitness += obj_on_plate.points.size();
+        }
+
+        float dist = 0;
+        for(int i = 0; i < ind_plate.objects.size() - 1; i++){
+            for(int j = i + 1; j < ind_plate.objects.size(); j++){
+                float cur_dist = calculate_distance(ind_plate.objects[i].weight_center, ind_plate.objects[j].weight_center);
+                dist += cur_dist;
+            }
+        }
+        dist /= ind_plate.objects.size();
+
+        std::cout << "average distance = " << dist << std::endl;
+
+        return fitness;
     }
 };
