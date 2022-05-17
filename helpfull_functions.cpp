@@ -97,6 +97,7 @@ void print_2d_matrix_in_console(std::vector<std::vector<int>> matrix){
 std::vector<std::vector<int>> rotate_matrix_clockwise(std::vector<std::vector<int>> matrix)
 {
     if(matrix.empty()){
+        std::cout << "rotating empty matrix" << std::endl;
         return matrix;
     }
 

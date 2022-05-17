@@ -81,6 +81,43 @@ public:
     int rotated_clockwise_90_counter = 0;
     POINT weight_center;
 
+//    Object(Object &sample_obj){
+//        for(FACE face : sample_obj.object_faces){
+//            object_faces.push_back(face);
+//        }
+//
+//        for(float f : sample_obj.boundaries){
+//            boundaries.push_back(f);
+//        }
+//
+//        for(auto row : sample_obj.body){
+//            std::vector<int> new_row;
+//            for(int value : row){
+//                new_row.push_back(value);
+//            }
+//            body.push_back(new_row);
+//        }
+//
+//        filename = sample_obj.filename;
+//        index = sample_obj.index;
+//
+//        for(POINT p : sample_obj.boundary_points){
+//            boundary_points.push_back(p);
+//        }
+//
+//        for(POINT p : sample_obj.points){
+//            points.push_back(p);
+//        }
+//
+//        edges = sample_obj.edges;
+//        for(POINT p : sample_obj.edges){
+//            edges.insert(p);
+//        }
+//
+//        rotated_clockwise_90_counter = 0;
+//        weight_center = sample_obj.weight_center;
+//    }
+
     bool boundary_point(int x, int y, std::vector<std::vector<int>> matrix){
         if (x == 0 or y == 0) return true;
         if (x == matrix.size()-1 or y == matrix[0].size() - 1) return true;
@@ -185,10 +222,10 @@ public:
 
         //rotate body;
         body = rotate_matrix_clockwise(body);
-        std::cout << "rotating object with index " << index << std::endl;
-
-        std::cout << "point 0 coordinates before" << std::endl;
-        std::cout << points[0].x << " " << points[0].y << std::endl;
+//        std::cout << "rotating object with index " << index << std::endl;
+//
+//        std::cout << "point 0 coordinates before" << std::endl;
+//        std::cout << points[0].x << " " << points[0].y << std::endl;
         //rotate boundary points
         for(auto &point : boundary_points){
             unsigned int temp = point.x;
@@ -203,8 +240,8 @@ public:
             point.y = body[0].size() - 1 - temp;
         }
 
-        std::cout << "point 0 coordinates after" << std::endl;
-        std::cout << points[0].x << " " << points[0].y << std::endl;
+//        std::cout << "point 0 coordinates after" << std::endl;
+//        std::cout << points[0].x << " " << points[0].y << std::endl;
         // rotate edges
         std::set<POINT> temp_set;
         for (auto itr = edges.begin(); itr != edges.end(); itr++){
@@ -214,7 +251,67 @@ public:
         }
         edges = temp_set;
 
-        rotated_clockwise_90_counter++;
+        rotated_clockwise_90_counter = (rotated_clockwise_90_counter + 1) % 4;
+    }
+
+    Object create_rotated(){
+        Object obj;
+        //TODO turn faces
+
+        // turn boundaries x->z
+        for(float f : boundaries){
+            obj.boundaries.push_back(f);
+        }
+        float temp = obj.boundaries[0];
+        obj.boundaries[0] = obj.boundaries[4];
+        obj.boundaries[4] = temp;
+
+        temp = obj.boundaries[1];
+        obj.boundaries[1] = obj.boundaries[5];
+        obj.boundaries[5] = temp;
+
+        //rotate body;
+        for(auto row : body){
+            std::vector<int> new_row;
+            for(int value : row){
+                new_row.push_back(value);
+            }
+            obj.body.push_back(new_row);
+        }
+
+        obj.body = rotate_matrix_clockwise(obj.body);
+
+        for(auto &point : boundary_points){
+            unsigned int temp = point.x;
+            point.x = point.y;
+            point.y = body[0].size() - 1 - temp;
+            obj.boundary_points.push_back(POINT {point.x, point.y});
+        }
+
+        //rotate points
+        for(auto &point : points){
+            unsigned int temp = point.x;
+            point.x = point.y;
+            point.y = body[0].size() - 1 - temp;
+            obj.points.push_back(POINT{point.x, point.y});
+        }
+
+        // rotate edges
+        std::set<POINT> temp_set;
+        for (auto itr = edges.begin(); itr != edges.end(); itr++){
+            unsigned int temp = itr->x;
+            POINT p = {itr->y, body[0].size() - 1 - temp};
+            temp_set.insert(p);
+        }
+        obj.edges = temp_set;
+
+        obj.rotated_clockwise_90_counter++;
+
+        obj.index = index;
+
+        obj.weight_center = POINT{weight_center.y, body[0].size() - 1 - weight_center.x};
+
+        return obj;
     }
 };
 
@@ -346,9 +443,9 @@ public:
     }
 
     int place_object_at_ref_point(Object obj, POINT ref_point){
-
         Object_on_plate new_object;
         new_object.object_id = obj.index;
+        new_object.rotated = obj.rotated_clockwise_90_counter;
 
         new_object.set_ref_point(ref_point);
 
@@ -391,11 +488,11 @@ public:
 
     int place_new_object(Object obj, bool info = false){
         if (obj.body.empty()){
-            std::cout << "ERROR!! empty body in object received" << std::endl;
+            std::cout << "ERROR!! empty body in object received while placing" << std::endl;
             return PLACEMENT_ERROR;
         }
         if(obj.body[0].empty()){
-            std::cout << "ERROR!! incorrect body frame received" << std::endl;
+            std::cout << "ERROR!! incorrect body frame received while placing" << std::endl;
             return PLACEMENT_ERROR;
         }
         if (info){
@@ -496,7 +593,9 @@ public:
             }
 
             if (x_place == -1 or y_place == size_y){
-                std::cout << "no more space for new obj" << std::endl;
+                if (info){
+                    std::cout << "no more space for new obj" << std::endl;
+                }
                 return PLACEMENT_ERROR;
             }
 
@@ -649,24 +748,30 @@ public:
 
         std::vector<int> chromosome;
 
+//        std::cout << "adding objects" << std::endl;
         for(int index : indexes_shuffle){
-            Object &obj = objects[index];
-            int rotate_count = get_random_int(0, 3);
-            std::cout << "rotating " << rotate_count << "times" <<std::endl;
+            Object obj = objects[index];
+
+            int rotate_count = get_random_int(0, 4);
+//            std::cout << "rotating " << rotate_count << "times" <<std::endl;
             for(int i = 0; i < rotate_count; i++){
                 obj.rotate_object_90_degrees_clockwise();
             }
+//            std::cout << index << " " << &obj << " " << &objects[index] << std::endl;
             if (plate.place_new_object(obj) == PLACEMENT_ERROR){
                 unplaced_objects++;
             } else{
                 chromosome.push_back(index);
             }
+//            std::cout << "done with " << index << std::endl;
         }
+//        std::cout << "added" << std::endl;
 
         ind_count++;
         ind_index = ind_count;
         ind_plate = plate;
         ind_chromosome = chromosome;
+//        std::cout << "created" << std::endl;
     }
 
     Individual(std::vector<int> chromo, std::vector<Object> &objects){
@@ -678,7 +783,7 @@ public:
         std::vector<int> chromosome;
 
         for(int index : chromo){
-            Object &obj = objects[index];
+            Object obj = objects[index];
             if (plate.place_new_object(obj) == PLACEMENT_ERROR){
                 unplaced_objects++;
             }else{
@@ -726,7 +831,7 @@ public:
 
     std::vector<Individual> crossover(Individual &second, std::vector<Object> &objects){
         std::vector<Individual> result;
-
+        //TODO remember the rotations of the objects
         int min_length = std::min(ind_chromosome.size(), second.ind_chromosome.size());
 
         int swap_start = get_random_int(0, min_length);

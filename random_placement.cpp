@@ -70,7 +70,7 @@ int main(int argc, char const *argv[]){
 //    save_matrix_to_file("mutation", ind.ind_plate.plate);
     ind.print_individual_info();
     ind1.print_individual_info();
-    std::cout << ind.get_fitness() << " " << ind1.get_fitness() << std::endl;
+    std::cout << ind.get_fitness() << "\n" << ind1.get_fitness() << std::endl;
 
     save_matrix_to_file("ind0", ind.ind_plate.plate);
     save_matrix_to_file("ind1", ind1.ind_plate.plate);
@@ -90,6 +90,16 @@ int main(int argc, char const *argv[]){
 //    for(Object_on_plate obj : ind.ind_plate.objects){
 //        std::cout << obj.weight_center.x << " " << obj.weight_center.y << std::endl;
 //    }
+
+    for(Object& obj : objects){
+        std::cout << obj.rotated_clockwise_90_counter << " ";
+    }
+    std::cout << std::endl;
+
+    for(Object_on_plate& obj : ind.ind_plate.objects){
+        std::cout << obj.rotated << " ";
+    }
+    std::cout << std::endl;
 
     return GENERAL_SUCCESS;
 }
