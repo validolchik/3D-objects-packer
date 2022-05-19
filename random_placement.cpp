@@ -70,26 +70,24 @@ int main(int argc, char const *argv[]){
 //    save_matrix_to_file("mutation", ind.ind_plate.plate);
     ind.print_individual_info();
     ind1.print_individual_info();
-    std::cout << ind.get_fitness() << "\n" << ind1.get_fitness() << std::endl;
+    std::cout << "fitness \n" << ind.get_fitness() << "\n" << ind1.get_fitness() << std::endl;
 
     save_matrix_to_file("ind0", ind.ind_plate.plate);
     save_matrix_to_file("ind1", ind1.ind_plate.plate);
 
-    std::vector<Individual> crossover_result = ind.crossover(ind1, objects);
+    std::vector<Individual> crossover_result = ind.crossover(ind1);
 
     int index = 0;
     for(Individual ind : crossover_result){
         save_matrix_to_file("ch" + std::to_string(index), ind.ind_plate.plate);
+
+        ind.print_individual_info();
         index++;
-        std::cout << "child "+std::to_string(index) + " chromosome size " << ind.ind_chromosome.size() << std::endl;
         std::cout << ind.get_fitness() << std::endl;
     }
 
     std::cout << "count of individuals = " << Individual::ind_count << std::endl;
 
-//    for(Object_on_plate obj : ind.ind_plate.objects){
-//        std::cout << obj.weight_center.x << " " << obj.weight_center.y << std::endl;
-//    }
 
     for(Object& obj : objects){
         std::cout << obj.rotated_clockwise_90_counter << " ";
