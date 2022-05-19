@@ -27,12 +27,18 @@
 
 #include "helpfull_functions.cpp"
 
-
-
 struct POINT{
     int x;
     int y;
 };
+
+float calculate_distance(POINT p1, POINT p2){
+
+    int x_d = (p1.x - p2.x);
+    int y_d = (p1.y - p2.y);
+
+    return sqrt(x_d * x_d + y_d * y_d);
+}
 
 inline bool operator<(const POINT& lhs, const POINT& rhs)
 {
@@ -73,6 +79,7 @@ public:
     std::vector<POINT> points;
     std::set<POINT> edges; //four points in the edges
     int rotated_clockwise_90_counter = 0;
+    POINT weight_center;
 
     bool boundary_point(int x, int y, std::vector<std::vector<int>> matrix){
         if (x == 0 or y == 0) return true;
@@ -178,10 +185,10 @@ public:
 
         //rotate body;
         body = rotate_matrix_clockwise(body);
-        std::cout << "rotating object with index " << index << std::endl;
-
-        std::cout << "point 0 coordinates before" << std::endl;
-        std::cout << points[0].x << " " << points[0].y << std::endl;
+//        std::cout << "rotating object with index " << index << std::endl;
+//
+//        std::cout << "point 0 coordinates before" << std::endl;
+//        std::cout << points[0].x << " " << points[0].y << std::endl;
         //rotate boundary points
         for(auto &point : boundary_points){
             unsigned int temp = point.x;
@@ -196,8 +203,8 @@ public:
             point.y = body[0].size() - 1 - temp;
         }
 
-        std::cout << "point 0 coordinates after" << std::endl;
-        std::cout << points[0].x << " " << points[0].y << std::endl;
+//        std::cout << "point 0 coordinates after" << std::endl;
+//        std::cout << points[0].x << " " << points[0].y << std::endl;
         // rotate edges
         std::set<POINT> temp_set;
         for (auto itr = edges.begin(); itr != edges.end(); itr++){
@@ -207,7 +214,67 @@ public:
         }
         edges = temp_set;
 
-        rotated_clockwise_90_counter++;
+        rotated_clockwise_90_counter = (rotated_clockwise_90_counter + 1) % 4;
+    }
+
+    Object create_rotated(){
+        Object obj;
+        //TODO turn faces
+
+        // turn boundaries x->z
+        for(float f : boundaries){
+            obj.boundaries.push_back(f);
+        }
+        float temp = obj.boundaries[0];
+        obj.boundaries[0] = obj.boundaries[4];
+        obj.boundaries[4] = temp;
+
+        temp = obj.boundaries[1];
+        obj.boundaries[1] = obj.boundaries[5];
+        obj.boundaries[5] = temp;
+
+        //rotate body;
+        for(auto row : body){
+            std::vector<int> new_row;
+            for(int value : row){
+                new_row.push_back(value);
+            }
+            obj.body.push_back(new_row);
+        }
+
+        obj.body = rotate_matrix_clockwise(obj.body);
+
+        for(auto &point : boundary_points){
+            unsigned int temp = point.x;
+            point.x = point.y;
+            point.y = body[0].size() - 1 - temp;
+            obj.boundary_points.push_back(POINT {point.x, point.y});
+        }
+
+        //rotate points
+        for(auto &point : points){
+            unsigned int temp = point.x;
+            point.x = point.y;
+            point.y = body[0].size() - 1 - temp;
+            obj.points.push_back(POINT{point.x, point.y});
+        }
+
+        // rotate edges
+        std::set<POINT> temp_set;
+        for (auto itr = edges.begin(); itr != edges.end(); itr++){
+            unsigned int temp = itr->x;
+            POINT p = {itr->y, body[0].size() - 1 - temp};
+            temp_set.insert(p);
+        }
+        obj.edges = temp_set;
+
+        obj.rotated_clockwise_90_counter++;
+
+        obj.index = index;
+
+        obj.weight_center = POINT{weight_center.y, body[0].size() - 1 - weight_center.x};
+
+        return obj;
     }
 };
 
@@ -218,6 +285,7 @@ public:
     std::vector<POINT> boundary_points; //actual boundaries of object on plate
     std::vector<POINT> points;
     std::set<POINT> edges;
+    POINT weight_center;
     int rotated = 0; // how many times rotated
 
     int set_ref_point(int x, int y){
@@ -255,8 +323,9 @@ public:
     std::vector<std::vector<int>> plate;
     int plate_default_placement_value;
     std::map<int, int> obj_index_to_list_index;
+    std::vector<Object> objects_itself;
 
-    explicit Plate(unsigned int size_x = 100, unsigned int size_y = 100, int default_value = -1){
+    explicit Plate(unsigned int size_x = 170, unsigned int size_y = 160, int default_value = -1){
         this->size_x = size_x;
         this->size_y = size_y;
         this->plate_default_placement_value = default_value;
@@ -338,9 +407,9 @@ public:
     }
 
     int place_object_at_ref_point(Object obj, POINT ref_point){
-
         Object_on_plate new_object;
         new_object.object_id = obj.index;
+        new_object.rotated = obj.rotated_clockwise_90_counter;
 
         new_object.set_ref_point(ref_point);
 
@@ -374,21 +443,25 @@ public:
             new_object.edges.insert(POINT{p.x + ref_point.x, p.y + ref_point.y});
         }
 
-        this->objects.push_back(new_object);
+        new_object.weight_center = POINT{obj.weight_center.x + ref_point.x, obj.weight_center.y + ref_point.y};
 
+        this->objects.push_back(new_object);
+        objects_itself.push_back(obj);
         return GENERAL_SUCCESS;
     }
 
     int place_new_object(Object obj, bool info = false){
         if (obj.body.empty()){
-            std::cout << "ERROR!! empty body in object received" << std::endl;
+            std::cout << "ERROR!! empty body in object received while placing" << std::endl;
             return PLACEMENT_ERROR;
         }
         if(obj.body[0].empty()){
-            std::cout << "ERROR!! incorrect body frame received" << std::endl;
+            std::cout << "ERROR!! incorrect body frame received while placing" << std::endl;
             return PLACEMENT_ERROR;
         }
-        std::cout << "placing obj with index " << obj.index  << std::endl;
+        if (info){
+            std::cout << "placing obj with index " << obj.index  << std::endl;
+        }
 
         if (objects_on_plate == 0){
             if (obj.body.size() > this->size_x or obj.body[0].size() > this->size_y){
@@ -408,8 +481,11 @@ public:
                 std::cout << "ERROR! Placement first model is broken" << std::endl;
             }
 
-            std::cout << "Placed on empty plate new object with sizes: " << obj_frame_size_x << " " << obj_frame_size_y << std::endl;
-            std::cout << "Selected place: (" << x_place << "; " << y_place << ")" << std::endl;
+            if (info){
+                std::cout << "Placed on empty plate new object with sizes: " << obj_frame_size_x << " " << obj_frame_size_y << std::endl;
+                std::cout << "Selected place: (" << x_place << "; " << y_place << ")" << std::endl;
+            }
+
 
         } else {
             //std::vector<std::vector<int>> unavailable_placement = this->plate;
@@ -481,7 +557,9 @@ public:
             }
 
             if (x_place == -1 or y_place == size_y){
-                std::cout << "no more space for new obj" << std::endl;
+                if (info){
+                    std::cout << "no more space for new obj" << std::endl;
+                }
                 return PLACEMENT_ERROR;
             }
 
@@ -492,10 +570,13 @@ public:
 
 //            int random_free_point_index = get_random_int(0, free_places.size());
 
-            std::cout << "placing not first object" << std::endl;
-
             POINT placement_point = {x_place, y_place};
-            std::cout << "ref point calculated... placing" << std::endl;
+
+            if(info){
+                std::cout << "placing not first object" << std::endl;
+                std::cout << "ref point calculated... placing" << std::endl;
+            }
+
             if (place_object_at_ref_point(obj, placement_point) == PLACEMENT_ERROR){
                 std::cout << "ERROR! ref point calculated wrong, objects collide\n Object unplaced" << std::endl;
             };
@@ -605,17 +686,19 @@ public:
 
 class Individual{
 public:
+    static int ind_count;
     int ind_index;
     Plate ind_plate;
     std::vector<int> ind_chromosome;
 
-    Individual(int index, std::vector<int> chromo, Plate plate){
-        ind_index = index;
+    Individual(std::vector<int> chromo, Plate plate){
+        ind_count++;
+        ind_index = ind_count;
         ind_chromosome = chromo;
         ind_plate = plate;
     }
 
-    Individual(int index, std::vector<Object> &objects){
+    Individual(std::vector<Object> &objects){
         std::cout << "creating new individ" << std::endl;
         Plate plate(objects[0].body.size() * 2 + 20, objects[0].body[0].size() * 2 + 20);
 
@@ -629,22 +712,58 @@ public:
 
         std::vector<int> chromosome;
 
+//        std::cout << "adding objects" << std::endl;
         for(int index : indexes_shuffle){
-            Object &obj = objects[index];
-            int rotate_count = get_random_int(0, 3);
-            std::cout << "rotating " << rotate_count << "times" <<std::endl;
+            Object obj = objects[index];
+
+            int rotate_count = get_random_int(0, 4);
+//            std::cout << "rotating " << rotate_count << "times" <<std::endl;
             for(int i = 0; i < rotate_count; i++){
                 obj.rotate_object_90_degrees_clockwise();
             }
+//            std::cout << index << " " << &obj << " " << &objects[index] << std::endl;
             if (plate.place_new_object(obj) == PLACEMENT_ERROR){
                 unplaced_objects++;
             } else{
                 chromosome.push_back(index);
             }
+//            std::cout << "done with " << index << std::endl;
         }
-        
+//        std::cout << "added" << std::endl;
+
+        ind_count++;
+        ind_index = ind_count;
         ind_plate = plate;
-        ind_index = index;
+        ind_chromosome = chromosome;
+//        std::cout << "created" << std::endl;
+    }
+
+    // only for crossover
+    Individual(std::vector<int> chromo, std::vector<Object> &objects_){
+        // get objects on plate, not objects
+        std::cout << "creating new individ" << std::endl;
+        Plate plate;
+
+        int unplaced_objects = 0;
+
+        std::vector<int> chromosome;
+
+        int in = 0;
+
+        for(int index : chromo){
+            Object obj = objects_[in];
+            in++;
+
+            if (plate.place_new_object(obj) == PLACEMENT_ERROR){
+                unplaced_objects++;
+            }else{
+                chromosome.push_back(index);
+            }
+        }
+
+        ind_count++;
+        ind_index = ind_count;
+        ind_plate = plate;
         ind_chromosome = chromosome;
     }
 
@@ -659,20 +778,17 @@ public:
         int temp = ind_chromosome[first_gen];
         ind_chromosome[first_gen] = ind_chromosome[second_gen];
         ind_chromosome[second_gen] = temp;
-
-//        ind_plate.print_plate_info();
         //delete objects from plate
         int x = ind_plate.size_x;
         int y = ind_plate.size_y;
         Plate new_plate(x, y);
         ind_plate = new_plate;
-//        ind_plate.print_plate_info();
 
         // fill plate again
         for(int index : ind_chromosome){
 
             Object obj = objects[index];
-            int rotate_count = get_random_int(0, 3);
+            // take object from chromosomes, before save them somewhere in intermediate storage
             if (ind_plate.place_new_object(obj) == PLACEMENT_ERROR){
                 std::cout << "genes not placed" << std::endl;
             }
@@ -682,15 +798,112 @@ public:
 
     std::vector<Individual> crossover(Individual &second){
         std::vector<Individual> result;
-
+        //TODO remember the rotations of the objects
         int min_length = std::min(ind_chromosome.size(), second.ind_chromosome.size());
 
-        int swap_start = get_random_int(0, min_length);
-        int swap_finish = get_random_int(swap_start, min_length);
+        int swap_start = get_random_int(0, min_length/2);
+        int swap_finish = get_random_int(swap_start, min_length-swap_start) + 1;
         
         std::cout << "min len " << min_length << " swap start " << swap_start << " swap finish " << swap_finish << std::endl;
         std::cout << "lenghts " << ind_chromosome.size() << " " << second.ind_chromosome.size() << std::endl;
-        
+
+        // copy objects selected for placement in local array and only then rotate them
+        // after GA is done, rotate the STL, and combine the whole file
+        std::vector<int> first_child;
+
+        std::map<int, int> first_child_map;
+
+        std::vector<Object> first_child_objects;
+        std::vector<Object> second_child_objects;
+
+        for(int i = swap_start; i < swap_finish; i++){
+            first_child.push_back(ind_chromosome[i]);
+//            std::cout << "rotated on plate " << i << " " << ind_plate.objects[i].rotated << " " << std::endl;
+            first_child_map[ind_chromosome[i]] = 1;
+
+//            std::cout << "checking whether map works" << std::endl;
+            int index_of_object = ind_plate.obj_index_to_list_index[ind_chromosome[i]];
+//            int index_of_object = get_index_of_object_with_index(ind_chromosome[i], ind_plate.objects_itself);
+//            std::cout << index_of_object << " " << ind_plate.obj_index_to_list_index[ind_chromosome[i]] << std::endl;
+
+            if(index_of_object != -1){
+                Object obj = ind_plate.objects_itself[index_of_object];
+                first_child_objects.push_back(obj);
+            } else{
+                std::cout << "something went wrong in composing first child" << std::endl;
+                return result;
+            }
+        }
+
+        std::cout << "first child pre gen " << first_child.size() << std::endl;
+        for(Object &obj : first_child_objects){
+            std::cout << obj.index << " " << obj.rotated_clockwise_90_counter << "; ";
+        }
+        std::cout << std::endl;
+
+        for(int value : second.ind_chromosome){
+            if( first_child_map.find(value) == first_child_map.end()){
+                first_child_map[value] = 1;
+                first_child.push_back(value);
+                std::cout << "!" << value << " ";
+                int index_of_object = second.ind_plate.obj_index_to_list_index[value];
+                if(index_of_object != -1){
+                    Object obj = second.ind_plate.objects_itself[index_of_object];
+                    first_child_objects.push_back(obj);
+                } else{
+                    std::cout << "something went wrong in composing first child from second" << std::endl;
+                    return result;
+                }
+            }
+        }
+
+        std::cout << "first child chromosome unplaced yet ";
+        for(int value : first_child){
+            std::cout << value << " ";
+        }
+        std::cout << std::endl;
+
+        result.push_back(Individual(first_child, first_child_objects));
+
+        std::vector<int> second_child;
+        std::map<int, int> second_child_map;
+
+        for(int i = 0; i < ind_chromosome.size(); i++){
+            if(i < swap_start or i >= swap_finish){
+                second_child.push_back(ind_chromosome[i]);
+                second_child_map[ind_chromosome[i]] = 1;
+                Object obj;
+                int index_of_obj = second.ind_plate.obj_index_to_list_index[ind_chromosome[i]];
+                obj = second.ind_plate.objects_itself[index_of_obj];
+                second_child_objects.push_back(obj);
+            }
+        }
+
+        for(int value : second.ind_chromosome){
+            if( second_child_map.find(value) == second_child_map.end()){
+                second_child_map[value] = 1;
+                second_child.push_back(value);
+                std::cout << "!" << value << " ";
+                int index_of_object = ind_plate.obj_index_to_list_index[value];
+                if(index_of_object != -1){
+                    Object obj = ind_plate.objects_itself[index_of_object];
+                    second_child_objects.push_back(obj);
+                } else{
+                    std::cout << "something went wrong in composing second child from first" << std::endl;
+                    return result;
+                }
+            }
+        }
+
+        std::cout << "second child chromosome unplaced yet ";
+        for(int value : second_child){
+            std::cout << value << " ";
+        }
+        std::cout << std::endl;
+
+        result.push_back(Individual(second_child, second_child_objects));
+
+        return result;
     }
 
     void print_individual_info(){
@@ -699,8 +912,54 @@ public:
         std::cout << "ind plate info" << std::endl;
         ind_plate.print_plate_info();
         std::cout << "chromosome size " << ind_chromosome.size() << std::endl;
-        std::cout << "chromosome ";
+        std::cout << "chromosome\n";
         for(auto c : ind_chromosome) std::cout << c << " ";
         std::cout << std::endl;
+        for(Object &obj : ind_plate.objects_itself) std::cout << obj.rotated_clockwise_90_counter << " ";
+        std::cout << std::endl;
+        std::cout << std::endl;
+    }
+
+    float get_fitness(){
+        float fitness = 0;
+
+        for(Object_on_plate &obj_on_plate : ind_plate.objects){
+            fitness += obj_on_plate.points.size();
+        }
+
+        float dist = 0;
+        for(int i = 0; i < ind_plate.objects.size() - 1; i++){
+            for(int j = i + 1; j < ind_plate.objects.size(); j++){
+                float cur_dist = calculate_distance(ind_plate.objects[i].weight_center, ind_plate.objects[j].weight_center);
+                dist += cur_dist;
+            }
+        }
+        int n = ind_plate.objects.size();
+        dist /= (n*n / 2);
+
+        std::cout << "average distance = " << dist << std::endl;
+
+        return fitness;
+    }
+
+    int get_index_of_object_with_index(int index, std::vector<Object> objects){
+
+        if(objects.empty()){
+            std::cout << "empty objects on plate received at get object with index" << std::endl;
+            return -1;
+        }
+
+        for(int i = 0; i < objects.size(); i++){
+            if(objects[i].index == index){
+                return i;
+            }
+        }
+        std::cout << "error in finding index " << index << std::endl;
+        for(Object &obj : objects){
+            std::cout << obj.index << " ";
+        }
+        std::cout << std::endl;
+
+        return -1;
     }
 };

@@ -8,6 +8,7 @@
 //#include "transform_to_array.cpp"
 #include "reading_transformation.cpp"
 
+int Individual::ind_count = 0;
 
 int main(int argc, char const *argv[]){
     int default_plate_value = 0;
@@ -59,12 +60,44 @@ int main(int argc, char const *argv[]){
 //    std::cout << "unplaced " << unplaced_objects << " objects" << std::endl;
 //    std::cout << "placed " << plate.objects.size() << std::endl;
 
-    Individual ind(0, objects);
+
+    Individual ind(objects);
+    Individual ind1(objects);
 
 //    save_matrix_to_file("before_mutation", ind.ind_plate.plate);
 //    ind.mutation(objects);
 
 //    save_matrix_to_file("mutation", ind.ind_plate.plate);
     ind.print_individual_info();
+    ind1.print_individual_info();
+    std::cout << "fitness \n" << ind.get_fitness() << "\n" << ind1.get_fitness() << std::endl;
+
+    save_matrix_to_file("ind0", ind.ind_plate.plate);
+    save_matrix_to_file("ind1", ind1.ind_plate.plate);
+
+    std::vector<Individual> crossover_result = ind.crossover(ind1);
+
+    int index = 0;
+    for(Individual ind : crossover_result){
+        save_matrix_to_file("ch" + std::to_string(index), ind.ind_plate.plate);
+
+        ind.print_individual_info();
+        index++;
+        std::cout << ind.get_fitness() << std::endl;
+    }
+
+    std::cout << "count of individuals = " << Individual::ind_count << std::endl;
+
+
+    for(Object& obj : objects){
+        std::cout << obj.rotated_clockwise_90_counter << " ";
+    }
+    std::cout << std::endl;
+
+    for(Object_on_plate& obj : ind.ind_plate.objects){
+        std::cout << obj.rotated << " ";
+    }
+    std::cout << std::endl;
+
     return GENERAL_SUCCESS;
 }
