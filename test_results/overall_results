@@ -1,0 +1,19 @@
+precision  0.05
+average covered area  78.5
+average time spend  18.3
+
+precision  0.03
+average covered area  72.5
+average time spend  17.9
+
+precision  0.02
+average covered area  70.3
+average time spend  24.7
+
+precision  0.01
+average covered area  67.1
+average time spend  37.0
+
+precision  0.005
+average covered area  65.3
+average time spend  136.9

@@ -100,11 +100,15 @@ std::vector<std::vector<int>> fill_body_grid(Object obj, std::vector<std::vector
 				if (point_in_triangle(p, v0, v1, v2)){
 					if (empty_grid[j][k] != -1) inside_count++;
 					empty_grid[j][k] = int(std::min(std::min(v0.z, v1.z), v2.z));
-					// empty_grid[j+1][k] = true;
-					// empty_grid[j+1][k] = true;
-					// empty_grid[j+1][k+1] = true;//fix the indexes here
-					// std::cout << p.x << ";" <<  p.z << " is inside" << std::endl;
-					// inside_count++;
+					if(j+1 < empty_grid.size()){
+                        empty_grid[j+1][k] = int(std::min(std::min(v0.z, v1.z), v2.z));
+                    }
+                    if(k+1 < empty_grid[0].size()){
+                        empty_grid[j][k+1] = int(std::min(std::min(v0.z, v1.z), v2.z));
+                    }
+                    if(j+1 < empty_grid.size() and k+1 < empty_grid[0].size()){
+                        empty_grid[j+1][k+1] = int(std::min(std::min(v0.z, v1.z), v2.z));
+                    }
 				}
 			}
 		}
