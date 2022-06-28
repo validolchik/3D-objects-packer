@@ -1,7 +1,4 @@
-*
+models/
 token
-!*.cpp
-!*.sh
-!*.txt
-!*.h
-!README.md
+.idea
+cmake-build-debug

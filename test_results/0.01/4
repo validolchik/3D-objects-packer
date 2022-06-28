@@ -1,0 +1,495 @@
+0.01 0.8 10 20
+
+Opening the models/self_created_models/shoulder_def_ascii.stl
+number of faces: 136
+shifting the object
+before: 0.086348
+after: 0.20476
+grid size
+24 29
+576 bytes
+filling the grid
+empty grid size
+24 29
+
+Opening the models/self_created_models/shoulder_def_ascii.stl
+number of faces: 136
+shifting the object
+before: 0.086348
+after: 0.20476
+grid size
+24 29
+576 bytes
+filling the grid
+empty grid size
+24 29
+
+Opening the models/self_created_models/shoulder_def_ascii.stl
+number of faces: 136
+shifting the object
+before: 0.086348
+after: 0.20476
+grid size
+24 29
+576 bytes
+filling the grid
+empty grid size
+24 29
+
+Opening the models/self_created_models/shoulder_def_ascii.stl
+number of faces: 136
+shifting the object
+before: 0.086348
+after: 0.20476
+grid size
+24 29
+576 bytes
+filling the grid
+empty grid size
+24 29
+
+Opening the models/self_created_models/shoulder_def_ascii.stl
+number of faces: 136
+shifting the object
+before: 0.086348
+after: 0.20476
+grid size
+24 29
+576 bytes
+filling the grid
+empty grid size
+24 29
+
+Opening the models/self_created_models/blah_ascii.stl
+number of faces: 192
+shifting the object
+before: -0.105153
+after: 0.102936
+grid size
+38 36
+912 bytes
+filling the grid
+empty grid size
+38 36
+
+Opening the models/self_created_models/blah_ascii.stl
+number of faces: 192
+shifting the object
+before: -0.105153
+after: 0.102936
+grid size
+38 36
+912 bytes
+filling the grid
+empty grid size
+38 36
+
+Opening the models/self_created_models/blah_ascii.stl
+number of faces: 192
+shifting the object
+before: -0.105153
+after: 0.102936
+grid size
+38 36
+912 bytes
+filling the grid
+empty grid size
+38 36
+
+Opening the models/self_created_models/blah_ascii.stl
+number of faces: 192
+shifting the object
+before: -0.105153
+after: 0.102936
+grid size
+38 36
+912 bytes
+filling the grid
+empty grid size
+38 36
+
+Opening the models/self_created_models/blah_ascii.stl
+number of faces: 192
+shifting the object
+before: -0.105153
+after: 0.102936
+grid size
+38 36
+912 bytes
+filling the grid
+empty grid size
+38 36
+
+Opening the models/self_created_models/blah_ascii.stl
+number of faces: 192
+shifting the object
+before: -0.105153
+after: 0.102936
+grid size
+38 36
+912 bytes
+filling the grid
+empty grid size
+38 36
+
+Opening the models/self_created_models/small_cube_ascii.stl
+number of faces: 12
+shifting the object
+before: 0.03918
+after: 0.07836
+grid size
+8 8
+192 bytes
+filling the grid
+empty grid size
+8 8
+
+Opening the models/self_created_models/small_cube_ascii.stl
+number of faces: 12
+shifting the object
+before: 0.03918
+after: 0.07836
+grid size
+8 8
+192 bytes
+filling the grid
+empty grid size
+8 8
+
+Opening the models/self_created_models/dragon_ascii.stl
+number of faces: 9024
+shifting the object
+before: 0.056177
+after: 0.054155
+grid size
+16 16
+384 bytes
+filling the grid
+empty grid size
+16 16
+
+Opening the models/self_created_models/dragon_ascii.stl
+number of faces: 9024
+shifting the object
+before: 0.056177
+after: 0.054155
+grid size
+16 16
+384 bytes
+filling the grid
+empty grid size
+16 16
+
+Opening the models/self_created_models/dragon_ascii.stl
+number of faces: 9024
+shifting the object
+before: 0.056177
+after: 0.054155
+grid size
+16 16
+384 bytes
+filling the grid
+empty grid size
+16 16
+
+Opening the models/self_created_models/suriken_ascii.stl
+number of faces: 16
+shifting the object
+before: -0.012645
+after: 0.08795
+grid size
+18 18
+432 bytes
+filling the grid
+empty grid size
+18 18
+
+Opening the models/self_created_models/suriken_ascii.stl
+number of faces: 16
+shifting the object
+before: -0.012645
+after: 0.08795
+grid size
+18 18
+432 bytes
+filling the grid
+empty grid size
+18 18
+
+Opening the models/self_created_models/suriken_ascii.stl
+number of faces: 16
+shifting the object
+before: -0.012645
+after: 0.08795
+grid size
+18 18
+432 bytes
+filling the grid
+empty grid size
+18 18
+
+Opening the models/self_created_models/suriken_ascii.stl
+number of faces: 16
+shifting the object
+before: -0.012645
+after: 0.08795
+grid size
+18 18
+432 bytes
+filling the grid
+empty grid size
+18 18
+
+Opening the models/self_created_models/suriken_ascii.stl
+number of faces: 16
+shifting the object
+before: -0.012645
+after: 0.08795
+grid size
+18 18
+432 bytes
+filling the grid
+empty grid size
+18 18
+Reading and processing files status is 0
+Elapsed time for reading in milliseconds: 1008 ms
+creating new individ 0 with plate size 80 0.01
+creating new individ 1 with plate size 80 0.01
+creating new individ 2 with plate size 80 0.01
+creating new individ 3 with plate size 80 0.01
+creating new individ 4 with plate size 80 0.01
+creating new individ 5 with plate size 80 0.01
+creating new individ 6 with plate size 80 0.01
+ERROR! ref point calculated wrong, objects collide
+ Object unplaced
+creating new individ 7 with plate size 80 0.01
+creating new individ 8 with plate size 80 0.01
+creating new individ 9 with plate size 80 0.01
+creating new individ 10 with plate size 80 0.01
+ERROR! ref point calculated wrong, objects collide
+ Object unplaced
+ERROR! ref point calculated wrong, objects collide
+ Object unplaced
+creating new individ 11 with plate size 80 0.01
+creating new individ 12 with plate size 80 0.01
+creating new individ 13 with plate size 80 0.01
+creating new individ 14 with plate size 80 0.01
+creating new individ 15 with plate size 80 0.01
+creating new individ 16 with plate size 80 0.01
+creating new individ 17 with plate size 80 0.01
+creating new individ 18 with plate size 80 0.01
+creating new individ 19 with plate size 80 0.01
+fitness of individuals
+13 3315 40.9552 6160
+17 3315 40.094 6000
+10 3458 39.355 5680
+8 3483 36.8755 5920
+7 3562 38.5961 6240
+12 3769 36.274 6320
+15 3780 37.354 6240
+2 3780 36.7786 6080
+9 3787 40.1428 5920
+3 3787 39.8332 6240
+4 3930 41.4829 6240
+20 3930 41.1453 6320
+6 3930 39.2579 6000
+14 3930 39.1305 6240
+5 3934 36.3816 5680
+18 3941 41.6815 6320
+11 3952 42.1524 6320
+19 4073 33.96 6160
+16 4080 36.3213 6320
+1 4084 32.0746 6240
+
+80size of plate
+selected 2 inds
+performed 2 mutations
+round 0
+--------------Individ-----------
+index 1
+chromosome size 8
+chromosome
+5 4 11 14 19 6 8 12 
+0 0 3 0 1 0 0 0 
+fitness = 63
+dist = 32.0746
+80;78 = 6240
+increase current_best_count -> 1
+Elapsed time for round in milliseconds: 3490
+selected 2 inds
+performed 2 mutations
+round 1
+--------------Individ-----------
+index 1
+chromosome size 8
+chromosome
+5 4 11 14 19 6 8 12 
+0 0 3 0 1 0 0 0 
+fitness = 63
+dist = 32.0746
+80;78 = 6240
+increase current_best_count -> 2
+Elapsed time for round in milliseconds: 2110
+selected 2 inds
+performed 2 mutations
+round 2
+--------------Individ-----------
+index 1
+chromosome size 8
+chromosome
+5 4 11 14 19 6 8 12 
+0 0 3 0 1 0 0 0 
+fitness = 63
+dist = 32.0746
+80;78 = 6240
+increase current_best_count -> 3
+Elapsed time for round in milliseconds: 2915
+selected 2 inds
+performed 2 mutations
+round 3
+--------------Individ-----------
+index 28
+chromosome size 6
+chromosome
+17 9 1 11 8 12 
+0 0 0 3 0 0 
+fitness = 68
+dist = 32.5858
+80;71 = 5680
+Elapsed time for round in milliseconds: 2914
+selected 2 inds
+performed 2 mutations
+round 4
+--------------Individ-----------
+index 28
+chromosome size 6
+chromosome
+17 9 1 11 8 12 
+0 0 0 3 0 0 
+fitness = 68
+dist = 32.5858
+80;71 = 5680
+increase current_best_count -> 1
+Elapsed time for round in milliseconds: 2959
+selected 2 inds
+performed 2 mutations
+round 5
+--------------Individ-----------
+index 31
+chromosome size 6
+chromosome
+17 9 1 11 8 12 
+0 0 0 3 0 0 
+fitness = 68
+dist = 32.5858
+80;71 = 5680
+increase current_best_count -> 2
+Elapsed time for round in milliseconds: 2679
+selected 2 inds
+performed 2 mutations
+round 6
+--------------Individ-----------
+index 33
+chromosome size 6
+chromosome
+9 1 11 8 12 5 
+0 0 3 0 0 0 
+fitness = 68
+dist = 32.5858
+80;71 = 5680
+increase current_best_count -> 3
+Elapsed time for round in milliseconds: 1819
+selected 2 inds
+performed 2 mutations
+round 7
+--------------Individ-----------
+index 33
+chromosome size 6
+chromosome
+9 1 11 8 12 5 
+0 0 3 0 0 0 
+fitness = 68
+dist = 32.5858
+80;71 = 5680
+increase current_best_count -> 4
+Elapsed time for round in milliseconds: 2296
+selected 2 inds
+performed 2 mutations
+round 8
+--------------Individ-----------
+index 33
+chromosome size 6
+chromosome
+9 1 11 8 12 5 
+0 0 3 0 0 0 
+fitness = 68
+dist = 32.5858
+80;71 = 5680
+increase current_best_count -> 5
+Elapsed time for round in milliseconds: 1631
+selected 2 inds
+performed 2 mutations
+round 9
+--------------Individ-----------
+index 39
+chromosome size 6
+chromosome
+9 1 17 11 8 12 
+0 0 0 3 0 0 
+fitness = 68
+dist = 32.5858
+80;71 = 5680
+increase current_best_count -> 6
+Elapsed time for round in milliseconds: 2817
+selected 2 inds
+performed 2 mutations
+round 10
+--------------Individ-----------
+index 41
+chromosome size 6
+chromosome
+9 1 17 11 8 12 
+0 0 0 3 0 0 
+fitness = 68
+dist = 32.5858
+80;71 = 5680
+increase current_best_count -> 7
+Elapsed time for round in milliseconds: 2824
+selected 2 inds
+performed 2 mutations
+round 11
+--------------Individ-----------
+index 41
+chromosome size 6
+chromosome
+9 1 17 11 8 12 
+0 0 0 3 0 0 
+fitness = 68
+dist = 32.5858
+80;71 = 5680
+increase current_best_count -> 8
+Elapsed time for round in milliseconds: 2868
+fitness of individuals
+3 3787 39.8332 6240
+14 3930 39.1305 6240
+6 3930 38.458 6320
+21 3930 35.8134 6240
+5 3934 36.4651 5760
+16 4080 36.3213 6320
+35 4388 32.6882 6240
+42 4388 32.6882 6240
+32 4388 32.6882 6240
+34 4388 32.6882 6240
+43 4388 32.6882 6240
+44 4388 32.5858 5680
+39 4388 32.5858 5680
+38 4388 32.5858 5680
+36 4388 32.5858 5680
+31 4388 32.5858 5680
+30 4388 32.5858 5680
+28 4388 32.5858 5680
+33 4388 32.5858 5680
+41 4388 32.5858 5680
+
+Elapsed time in seconds: 39 s - 39294
+Elapsed time for genetics in seconds: 38 s - 38285
